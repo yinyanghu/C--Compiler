@@ -1,6 +1,12 @@
 #ifndef LEXCHECKER_H
 #define LEXCHECKER_H
 
-void LexicalError(int error_type, char *message);
+#include "const.h"
+#include <stdio.h>
+
+int LexErr_Counter;
+
+//Error type A
+void LexChecker(int lineno, char *text, char *error_type, char *message);
 
 #endif

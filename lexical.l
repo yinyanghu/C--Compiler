@@ -1,5 +1,8 @@
 %{
+
+	#include "const.h"
 	#include "utility.h"
+	#include "LexChecker.h"
 
 	int yycolumnno = 1;
 %} 
@@ -21,12 +24,12 @@ float_B_base	((\.{digit}+)|({digit}+\.{digit}+)|({digit}+\.))
 float_B			{float_B_base}[eE][+-]?{digit}+
 floating		{float_A}|{float_B}
 
-hex_error		0[xX][{digit}|{letter}]*
-oct_error		0[{digit}|{letter}]*
-dec_error		[1-9][{digit}|{letter}]*
-float_error		(\.{digit}+)|({digit}+\.)|(\.[Ee][+-]?{digit}+)|({float_B_base}[Ee][+-]?)
+hex_error		0[xX]({digit}|{letter})*
+oct_error		0({digit}|{letter})*
+dec_error		[1-9]({digit}|{letter})*
+float_error		(\.{digit}+)|({digit}+\.)|(\.[Ee][+-]?{digit}+)|({float_B_base}[Ee][+-]?)|({digit}+[Ee][+-]?{digit}+)
 
-id				{letter}+[{letter}|{digit}]*
+id				{letter}+({letter}|{digit})*
 
 %option		yylineno
 
@@ -181,6 +184,14 @@ while			{
 					//return INT;
 				}
 
+{floating}		{
+					float key;
+					printf("FLOAT: ");
+					key = String_to_Float(yytext);
+					printf("%.6f\n", key);
+					//return FLOAT;
+				}
+
 {hex_error}		{
 					printf("Error type A at line %d: Illegal hexadecimal number \'%s\'\n", yylineno, yytext);
 				}
@@ -189,14 +200,14 @@ while			{
 					printf("Error type A at line %d: Illegal octal number \'%s\'\n", yylineno, yytext);
 				}
 
+{float_error}	{
+					printf("Error type A at line %d: Illegal floating point number \'%s\'\n", yylineno, yytext);
+				}
 
 {dec_error}		{
 					printf("Error type A at line %d: Illegal decimal number \'%s\'\n", yylineno, yytext);
 				}
 
-{float_error}	{
-					printf("Error type A at line %d: Illegal floating point number \'%s\'\n", yylineno, yytext);
-				}
 
 {id}			{
 					printf("ID: %s\n", yytext);
@@ -218,6 +229,6 @@ while			{
 int main(int argc, char **argv)
 {
 	yylex();
-	printf("Success!\n");
+	printf("Successful Termination!\n");
 	return 0;
 }
