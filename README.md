@@ -14,8 +14,11 @@ A simplified C Compiler
 * March 23, 2013
 
 > Next: Comment
+
 > Test this Analyser with lots of testcase
+
 > Lexical Analyser: Octal, Hexadecimal, Decimal, IEEE754 Single Precision Floating point ==> Completed!
+
 > Start!
 
 ***
