@@ -1,7 +1,7 @@
 %{
 	#include <stdio.h>
 	#include "lex.yy.c"
-	#include "SyntaxChecker.h"
+	#include "AST.h"
 %}
 
 %union

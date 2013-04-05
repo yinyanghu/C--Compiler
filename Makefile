@@ -7,6 +7,7 @@ LIB	= -lfl -ly
 
 Object = LexChecker.o \
 		 SyntaxChecker.o \
+		 AST.o \
 		 utility.o \
 		 syntax.tab.o \
 		 main.o

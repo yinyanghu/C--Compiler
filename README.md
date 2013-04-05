@@ -11,6 +11,22 @@ A simplified C Compiler
 
 ## Timeline
 
+* March 31, 2013
+
+> Syntax Analyser: Resynchronization
+
+> Syntax Analyser: Abstract Syntax Tree
+
+* March 30, 2013
+
+> Syntax Analyser: Framework ==> Completed!
+
+* March 24, 2013
+
+> Syntax Analyser: Framework
+
+> Lexical Analyser: Comment ==> Completed!
+
 * March 23, 2013
 
 > Next: Comment
