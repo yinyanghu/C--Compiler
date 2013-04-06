@@ -1,5 +1,7 @@
 #include "AST.h"
 
+/* TreeNode */
+
 inline int TreeNode_GetLineno(struct TreeNode *ptr)
 {
 	return ptr -> lineno;
@@ -9,6 +11,10 @@ inline void TreeNode_SetLineno(struct TreeNode *ptr, int key)
 {
 	ptr -> lineno = key;	
 }
+
+
+
+/* Build Function */
 
 struct Program *Build_Program(struct ExtDefList *child, int lineno)
 {
@@ -31,7 +37,7 @@ struct ExtDefList *Build_ExtDefList(struct ExtDef *child_A, struct ExtDefList *c
 	return ptr;
 }
 
-struct ExtDef *Build_ExtDef(void *child, void (*func_visit)(struct ExtDef *), int lineno)
+struct ExtDef *Build_ExtDef(void *child, void (*func_visit)(void *), int lineno)
 {
 	struct ExtDef	*ptr = (struct ExtDef *)malloc(sizeof(struct ExtDef));
 
@@ -85,7 +91,7 @@ struct ExtDecList *Build_ExtDecList(struct VarDec *child_A, struct ExtDecList *c
 }
 
 
-struct Specifier *Build_Specifier(void *child, void (*func_visit)(struct Specifier *), int lineno)
+struct Specifier *Build_Specifier(void *child, void (*func_visit)(void *), int lineno)
 {
 	struct Specifier	*ptr = (struct Specifier *)malloc(sizeof(struct Specifier));
 
@@ -116,7 +122,7 @@ struct Specifier_B *Build_Specifier_B(struct StructSpecifier *child)
 }
 
 
-struct StructSpecifier *Build_StructSpecifier(void *child, void (*func_visit)(struct StructSpecifier *), int lineno)
+struct StructSpecifier *Build_StructSpecifier(void *child, void (*func_visit)(void *), int lineno)
 {
 	struct StructSpecifier	*ptr = (struct StructSpecifier *)malloc(sizeof(struct StructSpecifier));
 
@@ -170,7 +176,7 @@ struct Tag *Build_Tag(struct ID *child, int lineno)
 }
 
 
-struct VarDec *Build_VarDec(void *child, void (*func_visit)(struct VarDec *), int lineno)
+struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), int lineno)
 {
 	struct VarDec	*ptr = (struct VarDec *)malloc(sizeof(struct VarDec));
 
@@ -256,7 +262,7 @@ struct StmtList *Build_StmtList(struct Stmt *child_A, struct StmtList *child_B, 
 	return ptr;
 }
 
-struct Stmt *Build_Stmt(void *child, void (*func_visit)(struct Stmt *), int lineno)
+struct Stmt *Build_Stmt(void *child, void (*func_visit)(void *), int lineno)
 {
 	struct Stmt		*ptr = (struct Stmt *)malloc(sizeof(struct Stmt));
 
@@ -372,7 +378,7 @@ struct Dec *Build_Dec(struct VarDec *child_A, struct Exp *child_B, int lineno)
 	return ptr;
 }
 
-struct Exp *Build_Exp(void *child, void (*func_visit)(struct Exp *), int lineno)
+struct Exp *Build_Exp(void *child, void (*func_visit)(void *), int lineno)
 {
 	struct Exp		*ptr = (struct Exp *)malloc(sizeof(struct Exp));
 
@@ -501,6 +507,446 @@ struct ID *Build_ID(char *child)
 	strcpy(ptr -> name, child);
 
 	return ptr;
+}
+
+
+
+
+
+
+
+/* Visit Function */
+
+
+void Visit_Program(struct Program *v)
+{
+	if (v == NULL) return;
+
+	PRINT("Program");
+	
+	Visit_ExtDefList(v -> extdeflist);
+
+}
+
+void Visit_ExtDefList(struct ExtDefList *v)
+{
+	if (v == NULL) return;
+
+	PRINT("ExtDefList");
+
+	Visit_ExtDef(v -> extdef);
+	Visit_ExtDefList(v -> extdeflist);
+
+}
+
+void Visit_ExtDef(struct ExtDef *v)
+{
+	if (v == NULL) return;
+
+	PRINT("ExtDef");
+	
+	v -> Visit(v -> next);
+
+}
+
+void Visit_ExtDef_A(void *v)
+{
+	if (v == NULL) return;
+	struct ExtDef_A		*ptr = (struct ExtDef_A *)v;
+
+	Visit_Specifier(ptr -> specifier);
+	Visit_ExtDecList(ptr -> extdeflist);
+}
+
+void Visit_ExtDef_B(void *v)
+{
+	if (v == NULL) return;
+	struct ExtDef_B		*ptr = (struct ExtDef_B *)v;
+
+	Visit_Specifier(ptr -> specifier);
+
+}
+
+void Visit_ExtDef_C(void *v)
+{
+	if (v == NULL) return;
+	struct ExtDef_C		*ptr = (struct ExtDef_C *)v;
+
+	Visit_Specifier(ptr -> specifier);
+	Visit_FunDec(ptr -> fundec);
+	Visit_CompSt(ptr -> compst);
+
+}
+
+void Visit_ExtDecList(struct ExtDecList *v)
+{
+	if (v == NULL) return;
+
+	PRINT("ExtDecList");
+
+	Visit_VarDec(v -> vardec);
+	Visit_ExtDecList(v -> extdeclist);
+}
+
+void Visit_Specifier(struct Specifier *v)
+{
+	if (v == NULL) return;
+
+	PRINT("Specifier");
+
+	v -> Visit(v -> next);
+}
+
+void Visit_Specifier_A(void *v)
+{
+	if (v == NULL) return;
+	struct Specifier_A	*ptr = (struct Specifier_A *)v;
+
+	PRINT("TYPE");
+
+}
+
+void Visit_Specifier_B(void *v)
+{
+	if (v == NULL) return;
+	struct Specifier_B	*ptr = (struct Specifier_B *)v;
+
+	Visit_StructSpecifier(ptr -> structspecifier);
+
+}
+
+void Visit_StructSpecifier(struct StructSpecifier *v)
+{
+	if (v == NULL) return;
+	PRINT("StructSpecifier");
+
+	v -> Visit(v -> next);
+
+}
+
+void Visit_StructSpecifier_A(void *v)
+{
+	if (v == NULL) return;
+	struct StructSpecifier_A	*ptr = (struct StructSpecifier_A *)v;
+
+	Visit_OptTag(ptr -> opttag);
+	Visit_DefList(ptr -> deflist);
+
+}
+
+void Visit_StructSpecifier_B(void *v)
+{
+	if (v == NULL) return;
+	struct StructSpecifier_B	*ptr = (struct StructSpecifier_B *)v;
+
+	Visit_Tag(ptr -> tag);
+
+}
+
+void Visit_OptTag(struct OptTag *v)
+{
+	if (v == NULL) return;
+	PRINT("OptTag");
+	
+	Visit_ID(v -> id);
+}
+
+void Visit_Tag(struct Tag *v)
+{
+	if (v == NULL) return;
+	PRINT("Tag");
+
+	Visit_ID(v -> id);
+}
+
+void Visit_VarDec(struct VarDec *v)
+{
+	if (v == NULL) return;
+	PRINT("VarDec");
+
+	v -> Visit(v -> next);
+}
+
+void Visit_VarDec_A(void *v)
+{
+	if (v == NULL) return;
+	struct VarDec_A		*ptr = (struct VarDec_A *)v;
+
+	Visit_ID(ptr -> id);
+}
+
+void Visit_VarDec_B(void *v)
+{
+	if (v == NULL) return;
+	struct VarDec_B		*ptr = (struct VarDec_B *)v;
+
+	Visit_VarDec(ptr -> vardec);
+	Visit_TYPE_INT(ptr -> type_int);
+}
+
+void Visit_FunDec(struct FunDec *v)
+{
+	if (v == NULL) return;
+
+	PRINT("FunDec");
+
+	Visit_ID(v -> id);
+	Visit_VarList(v -> varlist);
+
+}
+void Visit_VarList(struct VarList *v)
+{
+	if (v == NULL) return;
+
+	PRINT("VarList");
+
+	Visit_ParamDec(v -> paramdec);
+	Visit_VarList(v -> varlist);
+}
+
+void Visit_ParamDec(struct ParamDec *v)
+{
+	if (v == NULL) return;
+
+	PRINT("ParamDec");
+
+	Visit_Specifier(v -> specifier);
+	Visit_VarDec(v -> vardec);
+}
+
+void Visit_CompSt(struct CompSt *v)
+{
+	if (v == NULL) return;
+
+	PRINT("CompSt");
+
+	Visit_DefList(v -> deflist);
+	Visit_StmtList(v -> stmtlist);
+}
+
+void Visit_StmtList(struct StmtList *v)
+{
+	if (v == NULL) return;
+
+	PRINT("StmtList");
+
+	Visit_Stmt(v -> stmt);
+	Visit_StmtList(v -> stmtlist);
+
+}
+
+void Visit_Stmt(struct Stmt *v)
+{
+	if (v == NULL) return;
+
+	PRINT("Stmt");
+
+	v -> Visit(v -> next);
+
+}
+
+void Visit_Stmt_Exp(void *v)
+{
+	if (v == NULL) return;
+	struct Stmt_Exp		*ptr = (struct Stmt_Exp *)v;
+
+	Visit_Exp(ptr -> exp);
+}
+
+void Visit_Stmt_CompSt(void *v)
+{
+	if (v == NULL) return;
+	struct Stmt_CompSt	*ptr = (struct Stmt_CompSt *)v;
+
+	Visit_CompSt(ptr -> compst);
+}
+
+void Visit_Stmt_Return(void *v)
+{
+	if (v == NULL) return;
+	struct Stmt_Return	*ptr = (struct Stmt_Return *)v;
+
+	Visit_Exp(ptr -> exp);
+
+}
+
+void Visit_Stmt_If(void *v)
+{
+	if (v == NULL) return;
+	struct Stmt_If		*ptr = (struct Stmt_If *)v;
+	
+	Visit_Exp(ptr -> exp);
+	Visit_Stmt(ptr -> stmt);
+}
+
+void Visit_Stmt_If_Else(void *v)
+{
+	if (v == NULL) return;
+	struct Stmt_If_Else		*ptr = (struct Stmt_If_Else *)v;
+
+	Visit_Exp(ptr -> exp);
+	Visit_Stmt(ptr -> stmt_if);
+	Visit_Stmt(ptr -> stmt_else);
+}
+
+void Visit_Stmt_While(void *v)
+{
+	if (v == NULL) return;
+	struct Stmt_While		*ptr = (struct Stmt_While *)v;
+
+	Visit_Exp(ptr -> exp);
+	Visit_Stmt(ptr -> stmt);
+}
+
+void Visit_DefList(struct DefList *v)
+{
+	if (v == NULL) return;
+
+	PRINT("DefList");
+
+	Visit_Def(v -> def);
+	Visit_DefList(v -> deflist);
+
+}
+
+void Visit_Def(struct Def *v)
+{
+	if (v == NULL) return;
+
+	PRINT("Def");
+
+	Visit_Specifier(v -> specifier);
+	Visit_DecList(v -> declist);
+}
+
+void Visit_DecList(struct DecList *v)
+{
+	if (v == NULL) return;
+
+	PRINT("DecList");
+
+	Visit_Dec(v -> dec);
+	Visit_DecList(v -> declist);
+}
+
+void Visit_Dec(struct Dec *v)
+{
+	if (v == NULL) return;
+
+	PRINT("Dec");
+
+	Visit_VarDec(v -> vardec);
+	Visit_Exp(v -> exp);
+}
+
+void Visit_Exp(struct Exp *v)
+{
+	if (v == NULL) return;
+
+	PRINT("Exp");
+
+	v -> Visit(v -> next);
+}
+
+void Visit_Exp_Assign(void *v)
+{
+	if (v == NULL) return;
+	struct Exp_Assign	*ptr = (struct Exp_Assign *)v;
+
+	Visit_Exp(ptr -> exp_left);
+	Visit_Exp(ptr -> exp_right);
+}
+
+void Visit_Exp_Binary_Rel(void *v)
+{
+	if (v == NULL) return;
+	struct Exp_Binary_Rel	*ptr = (struct Exp_Binary_Rel *)v;
+
+	Visit_Exp(ptr -> exp_a);
+	Visit_Exp(ptr -> exp_b);
+}
+
+void Visit_Exp_Binary_Cal(void *v)
+{
+	if (v == NULL) return;
+	struct Exp_Binary_Cal	*ptr = (struct Exp_Binary_Cal *)v;
+
+	Visit_Exp(ptr -> exp_a);
+	Visit_Exp(ptr -> exp_b);
+}
+
+void Visit_Exp_Unary(void *v)
+{
+	if (v == NULL) return;
+	struct Exp_Unary	*ptr = (struct Exp_Unary *)v;
+
+	Visit_Exp(ptr -> exp);
+}
+
+void Visit_Exp_Function(void *v)
+{
+	if (v == NULL) return;
+	struct Exp_Function		*ptr = (struct Exp_Function *)v;
+
+	Visit_ID(ptr -> func);
+	Visit_Args(ptr -> args);
+}
+
+void Visit_Exp_Array(void *v)
+{
+	if (v == NULL) return;
+	struct Exp_Array		*ptr = (struct Exp_Array *)v;
+
+	Visit_Exp(ptr -> array);
+	Visit_Exp(ptr -> index);
+}
+
+void Visit_Exp_Attribute(void *v)
+{
+	if (v == NULL) return;
+	struct Exp_Attribute	*ptr = (struct Exp_Attribute *)v;
+
+	Visit_Exp(ptr -> exp);
+	Visit_ID(ptr -> attribute);
+}
+
+void Visit_Exp_Variable(void *v)
+{
+	if (v == NULL) return;
+	struct Exp_Variable		*ptr = (struct Exp_Variable *)v;
+
+	Visit_ID(ptr -> var);
+}
+
+void Visit_TYPE_INT(struct TYPE_INT *v)
+{
+	if (v == NULL) return;
+	PRINT("INT");
+
+}
+
+void Visit_TYPE_FLOAT(struct TYPE_FLOAT *v)
+{
+	if (v == NULL) return;
+	PRINT("FLOAT");
+
+}
+
+void Visit_Args(struct Args *v)
+{
+	if (v == NULL) return;
+
+	PRINT("Args");
+
+	Visit_Exp(v -> exp);
+	Visit_Args(v -> args);
+}
+
+void Visit_ID(struct ID *v)
+{
+	if (v == NULL) return;
+
+	PRINT("ID");
 }
 
 
