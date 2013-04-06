@@ -4,6 +4,7 @@
 	#include "utility.h"
 	#include "LexChecker.h"
 	#include "syntax.tab.h"
+	#include <string.h>
 
 	int yycolumnno = 1;
 %} 
@@ -184,34 +185,34 @@ while			{
 				}
 
 {hex}			{
-					unsigned int key;
-					printf("INT(HEX): ");
-					key = String_to_UnsignedInt(HEX_STRING, yytext);
-					printf("%d\n", key);
+					//unsigned int key;
+					printf("INT(HEX)\n");
+					yylval.key_int = String_to_Int(HEX_STRING, yytext);
+					//printf("%d\n", key);
 					return INT;
 				}
 
 {oct}			{
-					unsigned int key;
-					printf("INT(OCT): ");
-					key = String_to_UnsignedInt(OCT_STRING, yytext);
-					printf("%d\n", key);
+					//unsigned int key;
+					printf("INT(OCT)\n");
+					yylval.key_int = String_to_Int(OCT_STRING, yytext);
+					//printf("%d\n", key);
 					return INT;
 				}
 
 {dec}			{
-					unsigned int key;
-					printf("INT(DEC): ");
-					key = String_to_UnsignedInt(DEC_STRING, yytext);
-					printf("%d\n", key);
+					//unsigned int key;
+					printf("INT(DEC)\n");
+					yylval.key_int = String_to_Int(DEC_STRING, yytext);
+					//printf("%d\n", key);
 					return INT;
 				}
 
 {floating}		{
-					float key;
-					printf("FLOAT: ");
-					key = String_to_Float(yytext);
-					printf("%.6f\n", key);
+					//float key;
+					printf("FLOAT\n");
+					yylval.key_float = String_to_Float(yytext);
+					//printf("%.6f\n", key);
 					return FLOAT;
 				}
 
@@ -234,6 +235,7 @@ while			{
 
 {id}			{
 					printf("ID: %s\n", yytext);
+					yylval.key_string = strdup(yytext);
 					return ID;
 				}
 

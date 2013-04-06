@@ -7,29 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define STRING_SIZE		20
-
-typedef enum
-{
-	OP_EQ, OP_NE, OP_LT, OP_GT, OP_GE, OP_LE
-} BinaryOP_Relop;
-
-typedef enum
-{
-	OP_PLUS, OP_MINUS, OP_STAR, OP_DIV, OP_AND, OP_OR
-} BinaryOP_Calop;
-
-typedef enum
-{
-	OP_NOT, OP_NEG, OP_PAR
-} UnaryOP;
-
-typedef enum
-{
-	TYPE_INT, TYPE_FLOAT
-} DataType;
-
-
 
 struct TreeNode
 {
@@ -549,7 +526,6 @@ struct Stmt_If_Else			*Build_Stmt_If_Else(struct Exp *child_A, struct Stmt *chil
 
 struct Stmt_While			*Build_Stmt_While(struct Exp *child_A, struct Stmt *child_B);
 
-
 struct DefList				*Build_DefList(struct Def *child_A, struct DefList *child_B, int lineno);
 
 struct Def					*Build_Def(struct Specifier *child_A, struct DecList *child_B, int lineno);
@@ -630,10 +606,10 @@ void Visit_Exp_Function(void *v);
 void Visit_Exp_Array(void *v);
 void Visit_Exp_Attribute(void *v);
 void Visit_Exp_Variable(void *v);
-void Visit_TYPE_INT(struct TYPE_INT *v);
-void Visit_TYPE_FLOAT(struct TYPE_FLOAT *v);
+void Visit_TYPE_INT(void *v);
+void Visit_TYPE_FLOAT(void *v);
 void Visit_Args(struct Args *v);
-void Visit_ID(struct ID *v);
+void Visit_ID(void *v);
 
 
 

@@ -1,13 +1,13 @@
 #include "utility.h"
 
-unsigned int String_to_UnsignedInt(int string_type, char *string_digit)
+int String_to_Int(int string_type, char *string_digit)
 {
-	unsigned int ret;
+	 int ret;
 
 	if (string_type == OCT_STRING)
 		sscanf(string_digit, "%o", &ret);
 	else if (string_type == DEC_STRING)
-		sscanf(string_digit, "%u", &ret);
+		sscanf(string_digit, "%d", &ret);
 	else if (string_type == HEX_STRING)
 		sscanf(string_digit, "%x", &ret);
 	else

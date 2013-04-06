@@ -13,7 +13,7 @@
 #define PRINT_FLOAT(X)	printf("%.6f",X)
 #define ENDL			printf("\n")
 
-unsigned int String_to_UnsignedInt(int string_type, char *string_digit);
+int String_to_Int(int string_type, char *string_digit);
 
 float String_to_Float(char *string_digit);
 

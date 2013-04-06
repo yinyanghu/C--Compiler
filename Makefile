@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -I. -Werror
+CFLAGS = -I. -Werror -g
 
 FLEXLIB = -lfl
 BISONLIB = -lfl -ly
@@ -7,8 +7,8 @@ LIB	= -lfl -ly
 
 Object = LexChecker.o \
 		 SyntaxChecker.o \
-		 AST.o \
 		 utility.o \
+		 AST.o \
 		 syntax.tab.o \
 		 main.o
 

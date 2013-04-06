@@ -504,7 +504,9 @@ struct ID *Build_ID(char *child)
 {
 	struct ID		*ptr = (struct ID *)malloc(sizeof(struct ID));
 
+	printf("YES\n");
 	strcpy(ptr -> name, child);
+	printf("NO\n");
 
 	return ptr;
 }
@@ -918,16 +920,18 @@ void Visit_Exp_Variable(void *v)
 	Visit_ID(ptr -> var);
 }
 
-void Visit_TYPE_INT(struct TYPE_INT *v)
+void Visit_TYPE_INT(void *v)
 {
 	if (v == NULL) return;
+	struct TYPE_INT		*ptr = (struct TYPE_INT *)v;
 	PRINT("INT");
 
 }
 
-void Visit_TYPE_FLOAT(struct TYPE_FLOAT *v)
+void Visit_TYPE_FLOAT(void *v)
 {
 	if (v == NULL) return;
+	struct TYPE_FLOAT	*ptr = (struct TYPE_FLOAT *)v;
 	PRINT("FLOAT");
 
 }
@@ -942,10 +946,10 @@ void Visit_Args(struct Args *v)
 	Visit_Args(v -> args);
 }
 
-void Visit_ID(struct ID *v)
+void Visit_ID(void *v)
 {
 	if (v == NULL) return;
-
+	struct ID		*ptr = (struct ID *)v;
 	PRINT("ID");
 }
 

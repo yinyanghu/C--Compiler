@@ -11,6 +11,14 @@ A simplified C Compiler
 
 ## Timeline
 
+* April 7, 2013
+
+> Syntax Analyser: Abstract Syntax Tree ==> Completed!
+
+* April 6, 2013
+
+> Syntax Analyser: Abstract Syntax Tree
+
 * March 31, 2013
 
 > Syntax Analyser: Resynchronization
