@@ -7,7 +7,11 @@ void SyntaxChecker(int lineno, char *message)
 	fprintf(stderr, RED);
 #endif
 
-	fprintf(stderr, "Syntax Error!\n");
+	++ ErrorCounter;
+	if (message == NULL)
+		fprintf(stderr, "Error type B at line %d: Syntax Error\n", lineno);
+	else
+		fprintf(stderr, "Error type B at line %d: Syntax Error, %s\n", lineno, message);
 
 #ifdef GLOBAL_COLOR
 	fprintf(stderr, NORMAL);

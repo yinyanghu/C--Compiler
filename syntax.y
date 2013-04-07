@@ -108,13 +108,13 @@
 
 Program				:	ExtDefList
 						{
-							AST = Build_Program($1, 0);
+							AST = Build_Program($1, @$.first_line);
 						}
 					;
 
 ExtDefList			:	ExtDef ExtDefList
 						{
-							$$ = Build_ExtDefList($1, $2, 0);
+							$$ = Build_ExtDefList($1, $2, @$.first_line);
 						}
 					|	
 						{
@@ -124,28 +124,33 @@ ExtDefList			:	ExtDef ExtDefList
 
 ExtDef				:	Specifier ExtDecList SEMI
 						{
-							$$ = Build_ExtDef((void *)Build_ExtDef_A($1, $2), &Visit_ExtDef_A, 0);
+							$$ = Build_ExtDef((void *)Build_ExtDef_A($1, $2), &Visit_ExtDef_A, @$.first_line);
 						}
 					|	Specifier SEMI
 						{
-							$$ = Build_ExtDef((void *)Build_ExtDef_B($1), &Visit_ExtDef_B, 0);
+							$$ = Build_ExtDef((void *)Build_ExtDef_B($1), &Visit_ExtDef_B, @$.first_line);
 						}
 					|	Specifier FunDec CompSt
 						{
-							$$ = Build_ExtDef((void *)Build_ExtDef_C($1, $2, $3), &Visit_ExtDef_C, 0);
+							$$ = Build_ExtDef((void *)Build_ExtDef_C($1, $2, $3), &Visit_ExtDef_C, @$.first_line);
+						}
+					|	Specifier error SEMI
+						{
+							yyerrok;
 						}
 					|	error SEMI
 						{
+							yyerrok;
 						}
 					;
 
 ExtDecList			:	VarDec
 						{
-							$$ = Build_ExtDecList($1, NULL, 0);
+							$$ = Build_ExtDecList($1, NULL, @$.first_line);
 						}
 					|	VarDec COMMA ExtDecList
 						{
-							$$ = Build_ExtDecList($1, $3, 0);
+							$$ = Build_ExtDecList($1, $3, @$.first_line);
 						}
 					;
 
@@ -155,27 +160,27 @@ ExtDecList			:	VarDec
 
 Specifier			:	TYPE
 						{
-							$$ = Build_Specifier((void *)Build_Specifier_A($1), &Visit_Specifier_A, 0);	
+							$$ = Build_Specifier((void *)Build_Specifier_A($1), &Visit_Specifier_A, @$.first_line);	
 						}
 					|	StructSpecifier
 						{
-							$$ = Build_Specifier((void *)Build_Specifier_B($1), &Visit_Specifier_B, 0);	
+							$$ = Build_Specifier((void *)Build_Specifier_B($1), &Visit_Specifier_B, @$.first_line);	
 						}
 					;
 
 StructSpecifier		:	STRUCT OptTag LC DefList RC
 						{
-							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_A($2, $4), &Visit_StructSpecifier_A, 0);
+							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_A($2, $4), &Visit_StructSpecifier_A, @$.first_line);
 						}
 					|	STRUCT Tag
 						{
-							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_B($2), &Visit_StructSpecifier_B, 0);
+							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_B($2), &Visit_StructSpecifier_B, @$.first_line);
 						}
 					;
 
 OptTag				:	ID
 						{
-							$$ = Build_OptTag(Build_ID($1), 0);
+							$$ = Build_OptTag(Build_ID($1), @$.first_line);
 						}
 					|
 						{
@@ -185,7 +190,7 @@ OptTag				:	ID
 
 Tag					:	ID
 						{
-							$$ = Build_Tag(Build_ID($1), 0);
+							$$ = Build_Tag(Build_ID($1), @$.first_line);
 						}
 					;
 
@@ -197,37 +202,45 @@ Tag					:	ID
 
 VarDec				:	ID
 						{
-							$$ = Build_VarDec((void *)Build_VarDec_A(Build_ID($1)), &Visit_VarDec_A, 0);
+							$$ = Build_VarDec((void *)Build_VarDec_A(Build_ID($1)), &Visit_VarDec_A, @$.first_line);
 						}
 					|	VarDec LB INT RB
 						{
-							$$ = Build_VarDec((void *)Build_VarDec_B($1, Build_TYPE_INT($3)), &Visit_VarDec_B, 0);
+							$$ = Build_VarDec((void *)Build_VarDec_B($1, Build_TYPE_INT($3)), &Visit_VarDec_B, @$.first_line);
+						}
+					|	VarDec LB error RB
+						{
+							yyerrok;
 						}
 					;
 
 FunDec				:	ID LP VarList RP
 						{
-							$$ = Build_FunDec(Build_ID($1), $3, 0);
+							$$ = Build_FunDec(Build_ID($1), $3, @$.first_line);
 						}
 					|	ID LP RP
 						{
-							$$ = Build_FunDec(Build_ID($1), NULL, 0);
+							$$ = Build_FunDec(Build_ID($1), NULL, @$.first_line);
+						}
+					|	ID LP error RP
+						{
+							yyerrok;
 						}
 					;
 
 VarList				:	ParamDec COMMA VarList
 						{
-							$$ = Build_VarList($1, $3, 0);
+							$$ = Build_VarList($1, $3, @$.first_line);
 						}
 					|	ParamDec
 						{
-							$$ = Build_VarList($1, NULL, 0);
+							$$ = Build_VarList($1, NULL, @$.first_line);
 						}
 					;
 
 ParamDec			:	Specifier VarDec
 						{
-							$$ = Build_ParamDec($1, $2, 0);
+							$$ = Build_ParamDec($1, $2, @$.first_line);
 						}
 					;
 
@@ -236,13 +249,13 @@ ParamDec			:	Specifier VarDec
 
 CompSt				:	LC DefList StmtList RC
 						{
-							$$ = Build_CompSt($2, $3, 0);
+							$$ = Build_CompSt($2, $3, @$.first_line);
 						}
 					;
 
 StmtList			:	Stmt StmtList
 						{
-							$$ = Build_StmtList($1, $2, 0);
+							$$ = Build_StmtList($1, $2, @$.first_line);
 						}
 					|
 						{
@@ -252,36 +265,37 @@ StmtList			:	Stmt StmtList
 
 Stmt				:	Exp SEMI
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_Exp($1), &Visit_Stmt_Exp, 0);
+							$$ = Build_Stmt((void *)Build_Stmt_Exp($1), &Visit_Stmt_Exp, @$.first_line);
 						}
 					|	CompSt
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_CompSt($1), &Visit_Stmt_CompSt, 0);
+							$$ = Build_Stmt((void *)Build_Stmt_CompSt($1), &Visit_Stmt_CompSt, @$.first_line);
 						}
 					|	RETURN Exp SEMI
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_Return($2), &Visit_Stmt_Return, 0);
+							$$ = Build_Stmt((void *)Build_Stmt_Return($2), &Visit_Stmt_Return, @$.first_line);
 						}
 					|	IF LP Exp RP Stmt %prec LOWER_THAN_ELSE
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_If($3, $5), &Visit_Stmt_If, 0);
+							$$ = Build_Stmt((void *)Build_Stmt_If($3, $5), &Visit_Stmt_If, @$.first_line);
 						}
 					|	IF LP Exp RP Stmt ELSE Stmt
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_If_Else($3, $5, $7), &Visit_Stmt_If_Else, 0);
+							$$ = Build_Stmt((void *)Build_Stmt_If_Else($3, $5, $7), &Visit_Stmt_If_Else, @$.first_line);
 						}
 					|	WHILE LP Exp RP Stmt
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_While($3, $5), &Visit_Stmt_While, 0);
+							$$ = Build_Stmt((void *)Build_Stmt_While($3, $5), &Visit_Stmt_While, @$.first_line);
 						}
 					|	error SEMI
 						{
+							yyerrok;
 						}
 					;
 
 DefList				:	Def DefList
 						{
-							$$ = Build_DefList($1, $2, 0);
+							$$ = Build_DefList($1, $2, @$.first_line);
 						}
 					|
 						{
@@ -291,27 +305,27 @@ DefList				:	Def DefList
 
 Def					:	Specifier DecList SEMI
 						{
-							$$ = Build_Def($1, $2, 0);
+							$$ = Build_Def($1, $2, @$.first_line);
 						}
 					;
 
 DecList				:	Dec
 						{
-							$$ = Build_DecList($1, NULL, 0);
+							$$ = Build_DecList($1, NULL, @$.first_line);
 						}
 					|	Dec COMMA DecList
 						{
-							$$ = Build_DecList($1, $3, 0);
+							$$ = Build_DecList($1, $3, @$.first_line);
 						}
 					;
 
 Dec					:	VarDec
 						{
-							$$ = Build_Dec($1, NULL, 0);
+							$$ = Build_Dec($1, NULL, @$.first_line);
 						}
 					|	VarDec ASSIGNOP Exp
 						{
-							$$ = Build_Dec($1, $3, 0);
+							$$ = Build_Dec($1, $3, @$.first_line);
 						}
 					;
 
@@ -320,99 +334,100 @@ Dec					:	VarDec
 
 Exp					:	Exp ASSIGNOP Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Assign($1, $3), &Visit_Exp_Assign, 0);
+							$$ = Build_Exp((void *)Build_Exp_Assign($1, $3), &Visit_Exp_Assign, @$.first_line);
 						}
 					|	Exp AND Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_AND), &Visit_Exp_Binary_Cal, 0);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_AND), &Visit_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp OR Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_OR), &Visit_Exp_Binary_Cal, 0);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_OR), &Visit_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp RELOP Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Rel($1, $3, $2), &Visit_Exp_Binary_Rel, 0);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Rel($1, $3, $2), &Visit_Exp_Binary_Rel, @$.first_line);
 						}
 					|	Exp PLUS Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_PLUS), &Visit_Exp_Binary_Cal, 0);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_PLUS), &Visit_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp MINUS Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_MINUS), &Visit_Exp_Binary_Cal, 0);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_MINUS), &Visit_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp STAR Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_STAR), &Visit_Exp_Binary_Cal, 0);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_STAR), &Visit_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp DIV Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_DIV), &Visit_Exp_Binary_Cal, 0);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_DIV), &Visit_Exp_Binary_Cal, @$.first_line);
 						}
 					|	LP Exp RP
 						{
-							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_PAR), &Visit_Exp_Unary, 0);
+							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_PAR), &Visit_Exp_Unary, @$.first_line);
 						}
 					|	MINUS Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_NEG), &Visit_Exp_Unary, 0);
+							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_NEG), &Visit_Exp_Unary, @$.first_line);
 						}
 					|	NOT Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_NOT), &Visit_Exp_Unary, 0);
+							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_NOT), &Visit_Exp_Unary, @$.first_line);
 						}
 					|	ID LP Args RP
 						{
-							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), $3), &Visit_Exp_Function, 0);
+							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), $3), &Visit_Exp_Function, @$.first_line);
 						}
 					|	ID LP RP
 						{
-							printf("Panic!\n");
-							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), NULL), &Visit_Exp_Function, 0);
+							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), NULL), &Visit_Exp_Function, @$.first_line);
 						}
 					|	Exp LB Exp RB
 						{
-							$$ = Build_Exp((void *)Build_Exp_Array($1, $3), &Visit_Exp_Array, 0);
+							$$ = Build_Exp((void *)Build_Exp_Array($1, $3), &Visit_Exp_Array, @$.first_line);
 						}
 					|	Exp DOT ID
 						{
-							$$ = Build_Exp((void *)Build_Exp_Attribute($1, Build_ID($3)), &Visit_Exp_Attribute, 0);
+							$$ = Build_Exp((void *)Build_Exp_Attribute($1, Build_ID($3)), &Visit_Exp_Attribute, @$.first_line);
 						}
 					|	ID
 						{
-							$$ = Build_Exp((void *)Build_ID($1), &Visit_ID, 0);
+							$$ = Build_Exp((void *)Build_ID($1), &Visit_ID, @$.first_line);
 						}
 					|	INT
 						{
-							$$ = Build_Exp((void *)Build_TYPE_INT($1), &Visit_TYPE_INT, 0);
+							$$ = Build_Exp((void *)Build_TYPE_INT($1), &Visit_TYPE_INT, @$.first_line);
 						}
 					|	FLOAT
 						{
-							$$ = Build_Exp((void *)Build_TYPE_FLOAT($1), &Visit_TYPE_FLOAT, 0);
+							$$ = Build_Exp((void *)Build_TYPE_FLOAT($1), &Visit_TYPE_FLOAT, @$.first_line);
 						}
 					|	LP error RP
 						{
+							yyerrok;
 						}
-					|	Exp LB error RB
+					|	LB error RB
 						{
+							yyerrok;
 						}
 					;
 
 Args				:	Exp COMMA Args
 						{
-							$$ = Build_Args($1, $3, 0);
+							$$ = Build_Args($1, $3, @$.first_line);
 						}
 					|	Exp
 						{
-							$$ = Build_Args($1, NULL, 0);
+							$$ = Build_Args($1, NULL, @$.first_line);
 						}
 					;
 %%
 
 void yyerror(char *msg)
 {
-	SyntaxChecker(0, "xxx");
+	SyntaxChecker(yylineno, NULL);
 	//fprintf(stderr, "error!\n");
 }
 

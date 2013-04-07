@@ -4,7 +4,7 @@
 #include "const.h"
 #include <stdio.h>
 
-int LexErr_Counter;
+extern int ErrorCounter;
 
 //Error type A
 void LexChecker(int lineno, char *text, char *error_type, char *message);

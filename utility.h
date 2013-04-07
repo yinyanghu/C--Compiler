@@ -20,6 +20,7 @@
 #define IPrint(X)		++indent; \
 						PRINT(indent << 1,X); ENDL; \
 						--indent;
+#define LINE(V)			printf(" (%d)", TreeNode_GetLineno(&(V -> tree)));
 
 void print_indent(int x);
 

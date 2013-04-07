@@ -504,9 +504,7 @@ struct ID *Build_ID(char *child)
 {
 	struct ID		*ptr = (struct ID *)malloc(sizeof(struct ID));
 
-	printf("YES\n");
 	strcpy(ptr -> name, child);
-	printf("NO\n");
 
 	return ptr;
 }
@@ -525,7 +523,7 @@ void Visit_Program(struct Program *v)
 	if (v == NULL) return;
 
 	indent = 0;
-	PRINT(indent << 1, "Program"); ENDL;
+	PRINT(indent << 1, "Program"); LINE(v); ENDL;
 	
 	Visit_ExtDefList(v -> extdeflist);
 }
@@ -535,7 +533,7 @@ void Visit_ExtDefList(struct ExtDefList *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "ExtDefList"); ENDL;
+	PRINT(indent << 1, "ExtDefList"); LINE(v); ENDL;
 
 	Visit_ExtDef(v -> extdef);
 	Visit_ExtDefList(v -> extdeflist);
@@ -548,7 +546,7 @@ void Visit_ExtDef(struct ExtDef *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "ExtDef"); ENDL;
+	PRINT(indent << 1, "ExtDef"); LINE(v); ENDL;
 	
 	v -> Visit(v -> next);
 
@@ -591,7 +589,7 @@ void Visit_ExtDecList(struct ExtDecList *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "ExtDecList"); ENDL;
+	PRINT(indent << 1, "ExtDecList"); LINE(v); ENDL;
 
 	Visit_VarDec(v -> vardec);
 	if (v -> extdeclist != NULL)
@@ -609,7 +607,7 @@ void Visit_Specifier(struct Specifier *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "Specifier"); ENDL;
+	PRINT(indent << 1, "Specifier"); LINE(v); ENDL;
 
 	v -> Visit(v -> next);
 
@@ -637,7 +635,7 @@ void Visit_StructSpecifier(struct StructSpecifier *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "StructSpecifier");
+	PRINT(indent << 1, "StructSpecifier"); LINE(v); ENDL;
 
 	v -> Visit(v -> next);
 
@@ -675,7 +673,7 @@ void Visit_OptTag(struct OptTag *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "OptTag"); ENDL;
+	PRINT(indent << 1, "OptTag"); LINE(v); ENDL;
 	
 	Visit_ID(v -> id);
 
@@ -687,7 +685,7 @@ void Visit_Tag(struct Tag *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "Tag"); ENDL;
+	PRINT(indent << 1, "Tag"); LINE(v); ENDL;
 
 	Visit_ID(v -> id);
 
@@ -699,7 +697,7 @@ void Visit_VarDec(struct VarDec *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "VarDec"); ENDL;
+	PRINT(indent << 1, "VarDec"); LINE(v); ENDL;
 
 	v -> Visit(v -> next);
 
@@ -733,7 +731,7 @@ void Visit_FunDec(struct FunDec *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "FunDec"); ENDL;
+	PRINT(indent << 1, "FunDec"); LINE(v); ENDL;
 
 	Visit_ID(v -> id);
 
@@ -751,7 +749,7 @@ void Visit_VarList(struct VarList *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "VarList"); ENDL;
+	PRINT(indent << 1, "VarList"); LINE(v); ENDL;
 
 	Visit_ParamDec(v -> paramdec);
 	if (v -> varlist != NULL)
@@ -768,7 +766,7 @@ void Visit_ParamDec(struct ParamDec *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "ParamDec"); ENDL;
+	PRINT(indent << 1, "ParamDec"); LINE(v); ENDL;
 
 	Visit_Specifier(v -> specifier);
 	Visit_VarDec(v -> vardec);
@@ -781,7 +779,7 @@ void Visit_CompSt(struct CompSt *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "CompSt"); ENDL;
+	PRINT(indent << 1, "CompSt"); LINE(v); ENDL;
 
 	IPrint("LC");
 
@@ -798,7 +796,7 @@ void Visit_StmtList(struct StmtList *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "StmtList"); ENDL;
+	PRINT(indent << 1, "StmtList"); LINE(v); ENDL;
 
 	Visit_Stmt(v -> stmt);
 	Visit_StmtList(v -> stmtlist);
@@ -811,7 +809,7 @@ void Visit_Stmt(struct Stmt *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "Stmt"); ENDL;
+	PRINT(indent << 1, "Stmt"); LINE(v); ENDL;
  
 	v -> Visit(v -> next);
 
@@ -901,7 +899,7 @@ void Visit_DefList(struct DefList *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "DefList"); ENDL;
+	PRINT(indent << 1, "DefList"); LINE(v); ENDL;
 
 	Visit_Def(v -> def);
 	Visit_DefList(v -> deflist);
@@ -915,7 +913,7 @@ void Visit_Def(struct Def *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "Def"); ENDL;
+	PRINT(indent << 1, "Def"); LINE(v); ENDL;
 
 	Visit_Specifier(v -> specifier);
 	Visit_DecList(v -> declist);
@@ -930,7 +928,7 @@ void Visit_DecList(struct DecList *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "DecList"); ENDL;
+	PRINT(indent << 1, "DecList"); LINE(v); ENDL;
 
 	Visit_Dec(v -> dec);
 	if (v -> declist != NULL)
@@ -947,7 +945,7 @@ void Visit_Dec(struct Dec *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "Dec"); ENDL;
+	PRINT(indent << 1, "Dec"); LINE(v); ENDL;
 
 	Visit_VarDec(v -> vardec);
 	if (v -> exp != NULL)
@@ -964,7 +962,7 @@ void Visit_Exp(struct Exp *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "Exp"); ENDL;
+	PRINT(indent << 1, "Exp"); LINE(v); ENDL;
 
 	v -> Visit(v -> next);
 
@@ -1096,7 +1094,7 @@ void Visit_Args(struct Args *v)
 	if (v == NULL) return;
 
 	++ indent;
-	PRINT(indent << 1, "Args"); ENDL;
+	PRINT(indent << 1, "Args"); LINE(v); ENDL;
 
 	Visit_Exp(v -> exp);
 
