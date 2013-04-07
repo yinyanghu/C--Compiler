@@ -1,5 +1,15 @@
 #include "utility.h"
 
+
+void print_indent(int x)
+{
+	while (x --)
+	{
+		printf(" ");
+	}
+}
+
+
 int String_to_Int(int string_type, char *string_digit)
 {
 	 int ret;

@@ -28,6 +28,6 @@ lex.yy.c: lexical.l
 	flex lexical.l
 
 clean:
-	rm lex.yy.c syntax.tab.c
+	rm lex.yy.c syntax.tab.c syntax.output
 	rm *.o
 	rm cmm

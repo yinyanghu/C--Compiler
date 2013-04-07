@@ -524,31 +524,35 @@ void Visit_Program(struct Program *v)
 {
 	if (v == NULL) return;
 
-	PRINT("Program");
+	indent = 0;
+	PRINT(indent << 1, "Program"); ENDL;
 	
 	Visit_ExtDefList(v -> extdeflist);
-
 }
 
 void Visit_ExtDefList(struct ExtDefList *v)
 {
 	if (v == NULL) return;
 
-	PRINT("ExtDefList");
+	++ indent;
+	PRINT(indent << 1, "ExtDefList"); ENDL;
 
 	Visit_ExtDef(v -> extdef);
 	Visit_ExtDefList(v -> extdeflist);
 
+	--indent;
 }
 
 void Visit_ExtDef(struct ExtDef *v)
 {
 	if (v == NULL) return;
 
-	PRINT("ExtDef");
+	++ indent;
+	PRINT(indent << 1, "ExtDef"); ENDL;
 	
 	v -> Visit(v -> next);
 
+	-- indent;
 }
 
 void Visit_ExtDef_A(void *v)
@@ -558,6 +562,8 @@ void Visit_ExtDef_A(void *v)
 
 	Visit_Specifier(ptr -> specifier);
 	Visit_ExtDecList(ptr -> extdeflist);
+
+	IPrint("SEMI");
 }
 
 void Visit_ExtDef_B(void *v)
@@ -567,6 +573,7 @@ void Visit_ExtDef_B(void *v)
 
 	Visit_Specifier(ptr -> specifier);
 
+	IPrint("SEMI");
 }
 
 void Visit_ExtDef_C(void *v)
@@ -577,26 +584,36 @@ void Visit_ExtDef_C(void *v)
 	Visit_Specifier(ptr -> specifier);
 	Visit_FunDec(ptr -> fundec);
 	Visit_CompSt(ptr -> compst);
-
 }
 
 void Visit_ExtDecList(struct ExtDecList *v)
 {
 	if (v == NULL) return;
 
-	PRINT("ExtDecList");
+	++ indent;
+	PRINT(indent << 1, "ExtDecList"); ENDL;
 
 	Visit_VarDec(v -> vardec);
-	Visit_ExtDecList(v -> extdeclist);
+	if (v -> extdeclist != NULL)
+	{
+		IPrint("COMMA");
+
+		Visit_ExtDecList(v -> extdeclist);
+	}
+
+	-- indent;
 }
 
 void Visit_Specifier(struct Specifier *v)
 {
 	if (v == NULL) return;
 
-	PRINT("Specifier");
+	++ indent;
+	PRINT(indent << 1, "Specifier"); ENDL;
 
 	v -> Visit(v -> next);
+
+	-- indent;
 }
 
 void Visit_Specifier_A(void *v)
@@ -604,8 +621,7 @@ void Visit_Specifier_A(void *v)
 	if (v == NULL) return;
 	struct Specifier_A	*ptr = (struct Specifier_A *)v;
 
-	PRINT("TYPE");
-
+	Visit_DataType(ptr -> type);
 }
 
 void Visit_Specifier_B(void *v)
@@ -614,16 +630,18 @@ void Visit_Specifier_B(void *v)
 	struct Specifier_B	*ptr = (struct Specifier_B *)v;
 
 	Visit_StructSpecifier(ptr -> structspecifier);
-
 }
 
 void Visit_StructSpecifier(struct StructSpecifier *v)
 {
 	if (v == NULL) return;
-	PRINT("StructSpecifier");
+
+	++ indent;
+	PRINT(indent << 1, "StructSpecifier");
 
 	v -> Visit(v -> next);
 
+	-- indent;
 }
 
 void Visit_StructSpecifier_A(void *v)
@@ -631,9 +649,15 @@ void Visit_StructSpecifier_A(void *v)
 	if (v == NULL) return;
 	struct StructSpecifier_A	*ptr = (struct StructSpecifier_A *)v;
 
+	IPrint("STRUCT");
+
 	Visit_OptTag(ptr -> opttag);
+
+	IPrint("LC");
+
 	Visit_DefList(ptr -> deflist);
 
+	IPrint("RC");
 }
 
 void Visit_StructSpecifier_B(void *v)
@@ -641,32 +665,45 @@ void Visit_StructSpecifier_B(void *v)
 	if (v == NULL) return;
 	struct StructSpecifier_B	*ptr = (struct StructSpecifier_B *)v;
 
-	Visit_Tag(ptr -> tag);
+	IPrint("STRUCT");
 
+	Visit_Tag(ptr -> tag);
 }
 
 void Visit_OptTag(struct OptTag *v)
 {
 	if (v == NULL) return;
-	PRINT("OptTag");
+
+	++ indent;
+	PRINT(indent << 1, "OptTag"); ENDL;
 	
 	Visit_ID(v -> id);
+
+	-- indent;
 }
 
 void Visit_Tag(struct Tag *v)
 {
 	if (v == NULL) return;
-	PRINT("Tag");
+
+	++ indent;
+	PRINT(indent << 1, "Tag"); ENDL;
 
 	Visit_ID(v -> id);
+
+	-- indent;
 }
 
 void Visit_VarDec(struct VarDec *v)
 {
 	if (v == NULL) return;
-	PRINT("VarDec");
+
+	++ indent;
+	PRINT(indent << 1, "VarDec"); ENDL;
 
 	v -> Visit(v -> next);
+
+	-- indent;
 }
 
 void Visit_VarDec_A(void *v)
@@ -683,68 +720,102 @@ void Visit_VarDec_B(void *v)
 	struct VarDec_B		*ptr = (struct VarDec_B *)v;
 
 	Visit_VarDec(ptr -> vardec);
+
+	IPrint("LB");
+
 	Visit_TYPE_INT(ptr -> type_int);
+
+	IPrint("RB");
 }
 
 void Visit_FunDec(struct FunDec *v)
 {
 	if (v == NULL) return;
 
-	PRINT("FunDec");
+	++ indent;
+	PRINT(indent << 1, "FunDec"); ENDL;
 
 	Visit_ID(v -> id);
+
+	IPrint("LP");
+
 	Visit_VarList(v -> varlist);
 
+	IPrint("RP");
+
+	-- indent;
 }
+
 void Visit_VarList(struct VarList *v)
 {
 	if (v == NULL) return;
 
-	PRINT("VarList");
+	++ indent;
+	PRINT(indent << 1, "VarList"); ENDL;
 
 	Visit_ParamDec(v -> paramdec);
-	Visit_VarList(v -> varlist);
+	if (v -> varlist != NULL)
+	{
+		IPrint("COMMA");
+		Visit_VarList(v -> varlist);
+	}
+
+	-- indent;
 }
 
 void Visit_ParamDec(struct ParamDec *v)
 {
 	if (v == NULL) return;
 
-	PRINT("ParamDec");
+	++ indent;
+	PRINT(indent << 1, "ParamDec"); ENDL;
 
 	Visit_Specifier(v -> specifier);
 	Visit_VarDec(v -> vardec);
+
+	-- indent;
 }
 
 void Visit_CompSt(struct CompSt *v)
 {
 	if (v == NULL) return;
 
-	PRINT("CompSt");
+	++ indent;
+	PRINT(indent << 1, "CompSt"); ENDL;
+
+	IPrint("LC");
 
 	Visit_DefList(v -> deflist);
 	Visit_StmtList(v -> stmtlist);
+
+	IPrint("RC");
+
+	-- indent;
 }
 
 void Visit_StmtList(struct StmtList *v)
 {
 	if (v == NULL) return;
 
-	PRINT("StmtList");
+	++ indent;
+	PRINT(indent << 1, "StmtList"); ENDL;
 
 	Visit_Stmt(v -> stmt);
 	Visit_StmtList(v -> stmtlist);
 
+	-- indent;
 }
 
 void Visit_Stmt(struct Stmt *v)
 {
 	if (v == NULL) return;
 
-	PRINT("Stmt");
-
+	++ indent;
+	PRINT(indent << 1, "Stmt"); ENDL;
+ 
 	v -> Visit(v -> next);
 
+	-- indent;
 }
 
 void Visit_Stmt_Exp(void *v)
@@ -753,6 +824,7 @@ void Visit_Stmt_Exp(void *v)
 	struct Stmt_Exp		*ptr = (struct Stmt_Exp *)v;
 
 	Visit_Exp(ptr -> exp);
+	IPrint("SEMI");
 }
 
 void Visit_Stmt_CompSt(void *v)
@@ -768,16 +840,25 @@ void Visit_Stmt_Return(void *v)
 	if (v == NULL) return;
 	struct Stmt_Return	*ptr = (struct Stmt_Return *)v;
 
+	IPrint("RETURN");
+
 	Visit_Exp(ptr -> exp);
 
+	IPrint("SEMI");
 }
 
 void Visit_Stmt_If(void *v)
 {
 	if (v == NULL) return;
 	struct Stmt_If		*ptr = (struct Stmt_If *)v;
-	
+
+	IPrint("IF");	
+	IPrint("LP");
+
 	Visit_Exp(ptr -> exp);
+
+	IPrint("RP");
+
 	Visit_Stmt(ptr -> stmt);
 }
 
@@ -786,8 +867,17 @@ void Visit_Stmt_If_Else(void *v)
 	if (v == NULL) return;
 	struct Stmt_If_Else		*ptr = (struct Stmt_If_Else *)v;
 
+	IPrint("IF");	
+	IPrint("LP");
+
 	Visit_Exp(ptr -> exp);
+
+	IPrint("RP");
+
 	Visit_Stmt(ptr -> stmt_if);
+
+	IPrint("ELSE");
+
 	Visit_Stmt(ptr -> stmt_else);
 }
 
@@ -796,7 +886,13 @@ void Visit_Stmt_While(void *v)
 	if (v == NULL) return;
 	struct Stmt_While		*ptr = (struct Stmt_While *)v;
 
+	IPrint("WHILE");
+	IPrint("LP");
+
 	Visit_Exp(ptr -> exp);
+
+	IPrint("RP");
+
 	Visit_Stmt(ptr -> stmt);
 }
 
@@ -804,10 +900,13 @@ void Visit_DefList(struct DefList *v)
 {
 	if (v == NULL) return;
 
-	PRINT("DefList");
+	++ indent;
+	PRINT(indent << 1, "DefList"); ENDL;
 
 	Visit_Def(v -> def);
 	Visit_DefList(v -> deflist);
+
+	-- indent;
 
 }
 
@@ -815,39 +914,61 @@ void Visit_Def(struct Def *v)
 {
 	if (v == NULL) return;
 
-	PRINT("Def");
+	++ indent;
+	PRINT(indent << 1, "Def"); ENDL;
 
 	Visit_Specifier(v -> specifier);
 	Visit_DecList(v -> declist);
+
+	IPrint("SEMI");
+
+	-- indent;
 }
 
 void Visit_DecList(struct DecList *v)
 {
 	if (v == NULL) return;
 
-	PRINT("DecList");
+	++ indent;
+	PRINT(indent << 1, "DecList"); ENDL;
 
 	Visit_Dec(v -> dec);
-	Visit_DecList(v -> declist);
+	if (v -> declist != NULL)
+	{
+		IPrint("COMMA");
+		Visit_DecList(v -> declist);
+	}
+
+	-- indent;
 }
 
 void Visit_Dec(struct Dec *v)
 {
 	if (v == NULL) return;
 
-	PRINT("Dec");
+	++ indent;
+	PRINT(indent << 1, "Dec"); ENDL;
 
 	Visit_VarDec(v -> vardec);
-	Visit_Exp(v -> exp);
+	if (v -> exp != NULL)
+	{
+		IPrint("ASSIGNOP");
+		Visit_Exp(v -> exp);
+	}
+
+	-- indent;
 }
 
 void Visit_Exp(struct Exp *v)
 {
 	if (v == NULL) return;
 
-	PRINT("Exp");
+	++ indent;
+	PRINT(indent << 1, "Exp"); ENDL;
 
 	v -> Visit(v -> next);
+
+	-- indent;
 }
 
 void Visit_Exp_Assign(void *v)
@@ -856,6 +977,9 @@ void Visit_Exp_Assign(void *v)
 	struct Exp_Assign	*ptr = (struct Exp_Assign *)v;
 
 	Visit_Exp(ptr -> exp_left);
+
+	IPrint("ASSIGNOP");
+
 	Visit_Exp(ptr -> exp_right);
 }
 
@@ -865,6 +989,9 @@ void Visit_Exp_Binary_Rel(void *v)
 	struct Exp_Binary_Rel	*ptr = (struct Exp_Binary_Rel *)v;
 
 	Visit_Exp(ptr -> exp_a);
+
+	IPrint("RELOP"); //Visit_RELOP
+
 	Visit_Exp(ptr -> exp_b);
 }
 
@@ -874,6 +1001,7 @@ void Visit_Exp_Binary_Cal(void *v)
 	struct Exp_Binary_Cal	*ptr = (struct Exp_Binary_Cal *)v;
 
 	Visit_Exp(ptr -> exp_a);
+	Visit_BinaryOP_Calop(ptr -> op);
 	Visit_Exp(ptr -> exp_b);
 }
 
@@ -882,7 +1010,17 @@ void Visit_Exp_Unary(void *v)
 	if (v == NULL) return;
 	struct Exp_Unary	*ptr = (struct Exp_Unary *)v;
 
-	Visit_Exp(ptr -> exp);
+	if (ptr -> op == OP_PAR)
+	{
+		IPrint("LP");
+		Visit_Exp(ptr -> exp);
+		IPrint("RP");
+	}
+	else
+	{
+		Visit_UnaryOP(ptr -> op);
+		Visit_Exp(ptr -> exp);
+	}
 }
 
 void Visit_Exp_Function(void *v)
@@ -891,7 +1029,12 @@ void Visit_Exp_Function(void *v)
 	struct Exp_Function		*ptr = (struct Exp_Function *)v;
 
 	Visit_ID(ptr -> func);
+
+	IPrint("LP");
+
 	Visit_Args(ptr -> args);
+
+	IPrint("RP");
 }
 
 void Visit_Exp_Array(void *v)
@@ -900,7 +1043,12 @@ void Visit_Exp_Array(void *v)
 	struct Exp_Array		*ptr = (struct Exp_Array *)v;
 
 	Visit_Exp(ptr -> array);
+
+	IPrint("LB");
+
 	Visit_Exp(ptr -> index);
+
+	IPrint("RB");
 }
 
 void Visit_Exp_Attribute(void *v)
@@ -909,6 +1057,9 @@ void Visit_Exp_Attribute(void *v)
 	struct Exp_Attribute	*ptr = (struct Exp_Attribute *)v;
 
 	Visit_Exp(ptr -> exp);
+
+	IPrint("DOT");
+
 	Visit_ID(ptr -> attribute);
 }
 
@@ -924,33 +1075,103 @@ void Visit_TYPE_INT(void *v)
 {
 	if (v == NULL) return;
 	struct TYPE_INT		*ptr = (struct TYPE_INT *)v;
-	PRINT("INT");
 
+	++ indent;
+	PRINT(indent << 1, "INT: "); printf("%d", ptr -> key); ENDL;
+	-- indent;
 }
 
 void Visit_TYPE_FLOAT(void *v)
 {
 	if (v == NULL) return;
 	struct TYPE_FLOAT	*ptr = (struct TYPE_FLOAT *)v;
-	PRINT("FLOAT");
 
+	++ indent;
+	PRINT(indent << 1, "FLOAT: "); printf("%.6f", ptr -> key); ENDL;
+	-- indent;
 }
 
 void Visit_Args(struct Args *v)
 {
 	if (v == NULL) return;
 
-	PRINT("Args");
+	++ indent;
+	PRINT(indent << 1, "Args"); ENDL;
 
 	Visit_Exp(v -> exp);
-	Visit_Args(v -> args);
+
+	if (v -> args != NULL)
+	{
+		IPrint("COMMA");
+		Visit_Args(v -> args);
+	}
+
+	-- indent;
 }
 
 void Visit_ID(void *v)
 {
 	if (v == NULL) return;
 	struct ID		*ptr = (struct ID *)v;
-	PRINT("ID");
+	
+	++ indent;
+	PRINT(indent << 1, "ID: "); printf("%s", ptr -> name); ENDL;
+	-- indent;
 }
 
 
+void Visit_DataType(DataType v)
+{
+	++ indent;
+	PRINT(indent << 1, "TYPE: ");
+	if (v == TYPE_INT)
+	{
+		printf("int");
+	}
+	else
+	{
+		printf("float");
+	}
+	ENDL;
+	-- indent;
+}
+
+void Visit_BinaryOP_Calop(BinaryOP_Calop v)
+{
+	if (v == OP_PLUS)
+	{
+		IPrint("PLUS");
+	}
+	else if (v == OP_MINUS)
+	{
+		IPrint("MINUS");
+	}
+	else if (v == OP_STAR)
+	{
+		IPrint("STAR");
+	}
+	else if (v == OP_DIV)
+	{
+		IPrint("DIV");
+	}
+	else if (v == OP_AND)
+	{
+		IPrint("AND");
+	}
+	else
+	{
+		IPrint("OR");
+	}
+}
+
+void Visit_UnaryOP(UnaryOP v) //except case: (Exp)
+{
+	if (v == OP_NOT)
+	{
+		IPrint("NOT");
+	}
+	else if (v == OP_NEG)
+	{
+		IPrint("MINUS");
+	}
+}

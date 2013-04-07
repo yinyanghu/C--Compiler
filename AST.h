@@ -8,6 +8,8 @@
 #include <string.h>
 
 
+int indent;
+
 struct TreeNode
 {
 	int lineno;
@@ -610,6 +612,9 @@ void Visit_TYPE_INT(void *v);
 void Visit_TYPE_FLOAT(void *v);
 void Visit_Args(struct Args *v);
 void Visit_ID(void *v);
+void Visit_DataType(DataType v);
+void Visit_BinaryOP_Calop(BinaryOP_Calop v);
+void Visit_UnaryOP(UnaryOP v);
 
 
 

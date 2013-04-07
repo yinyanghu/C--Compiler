@@ -15,6 +15,8 @@ int main(int argc, char **argv)
 	yyparse();
 
 	printf("==========================================\n");
+
 	Visit_Program(AST);
+
 	return 0;	
 }
