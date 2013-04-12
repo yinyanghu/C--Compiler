@@ -8,39 +8,34 @@ int k, s, t;
 struct kk
 {
 	int p, q;
-	struct pp	ss;
+	struct pp	ss
 };
 int B[2][2];
 int m;
 
 
-int ss(int k, int b, int c,struct ss sd, int s)
+int s(int k, int b, int c)
 {
-	ss = 2
+	int ss;
 }
 
-float A[23];
-struct  pi;
+float A[3];
+struct  pp	kk;
 
-int f()
+int t(struct pp		temp)
 {
 	int b = 0;
 	if (a == 0)
 		b = A[2];
-	while (k == 0)
-		if (sdf)
-		while (j == 0)
-			if (k == 0) sdfsdl; else sdfsdf;
-	
 	a = a + 1;
 	a = a - 1 + 1 * 2;
 	a = a / b;
 	a = !a;
 	c = f(sdf, sei, 3, 0, NULL);
-	b[s[kk.s]].s = t(pp);
+	b[a[kk.s]].s = t(pp);
 	kk.s = 1;
 	if (a == b)
-		return 0;
+		return 1;
 	else
 		return -1;
 }

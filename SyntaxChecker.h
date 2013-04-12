@@ -7,5 +7,6 @@ extern int ErrorCounter;
 
 //Error type B
 void SyntaxChecker(int lineno, char *message);
+void SyntaxErrorReport(char *message);
 
 #endif

@@ -13,8 +13,8 @@ int ErrorCounter;
 
 int main(int argc, char **argv)
 {
-//	yydebug = 1;
-	
+	yydebug = 1;
+
 	if (argc != 2)
 	{
 		fprintf(stderr, "cmm: fatal error: No input files or Not only one input files\n");
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	yyparse();
 	fclose(f);
 
-//	if (ErrorCounter == 0)
+	if (ErrorCounter == 0)
 		Visit_Program(AST);
 
 	return 0;	

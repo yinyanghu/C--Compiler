@@ -2,10 +2,9 @@
 	#include <stdio.h>
 	#include "lex.yy.c"
 	#include "AST.h"
-	#include "SyntaxChecker.h"
 
 	extern struct Program	*AST;
-	void yyerror(const char *msg);
+	void yyerror(char *msg);
 %}
 
 %union
@@ -106,7 +105,6 @@
 %nonassoc	STMT_ERROR
 %nonassoc	DEF_ERROR
 
-
 %start		Program
 
 
@@ -144,7 +142,7 @@ ExtDef				:	Specifier ExtDecList SEMI
 						{
 							yyerrok;
 						}
-					|	error ExtDef
+					|	Specifier error CompSt
 						{
 							yyerrok;
 						}
@@ -157,6 +155,10 @@ ExtDecList			:	VarDec
 					|	VarDec COMMA ExtDecList
 						{
 							$$ = Build_ExtDecList($1, $3, @$.first_line);
+						}
+					|	error COMMA ExtDecList
+						{
+							yyerrok;
 						}
 					;
 
@@ -232,10 +234,6 @@ FunDec				:	ID LP VarList RP
 						{
 							yyerrok;
 						}
-					|	error LP VarList RP
-						{
-							yyerrok;
-						}
 					;
 
 VarList				:	ParamDec COMMA VarList
@@ -246,6 +244,10 @@ VarList				:	ParamDec COMMA VarList
 						{
 							$$ = Build_VarList($1, NULL, @$.first_line);
 						}
+					|	error COMMA VarList
+						{
+							yyerrok;
+						}
 					;
 
 ParamDec			:	Specifier VarDec
@@ -255,13 +257,11 @@ ParamDec			:	Specifier VarDec
 					;
 
 
+
+
 CompSt				:	LC DefList StmtList RC
 						{
 							$$ = Build_CompSt($2, $3, @$.first_line);
-						}
-					|	Exp error RC
-						{
-							yyerrok;
 						}
 					;
 
@@ -299,7 +299,7 @@ Stmt				:	Exp SEMI
 						{
 							$$ = Build_Stmt((void *)Build_Stmt_While($3, $5), &Visit_Stmt_While, @$.first_line);
 						}
-					|	error SEMI
+					|	error SEMI %prec STMT_ERROR
 						{
 							yyerrok;
 						}
@@ -309,7 +309,7 @@ DefList				:	Def DefList
 						{
 							$$ = Build_DefList($1, $2, @$.first_line);
 						}
-					|	
+					|	%prec DEF_EMPTY
 						{
 							$$ = NULL;
 						}
@@ -319,7 +319,7 @@ Def					:	Specifier DecList SEMI
 						{
 							$$ = Build_Def($1, $2, @$.first_line);
 						}
-					|	Specifier error SEMI
+					|	error SEMI %prec DEF_ERROR
 						{
 							yyerrok;
 						}
@@ -332,6 +332,10 @@ DecList				:	Dec
 					|	Dec COMMA DecList
 						{
 							$$ = Build_DecList($1, $3, @$.first_line);
+						}
+					|	error COMMA DecList
+						{
+							yyerrok;
 						}
 					;
 
@@ -441,8 +445,9 @@ Args				:	Exp COMMA Args
 					;
 %%
 
-void yyerror(const char *msg)
+void yyerror(char *msg)
 {
 	SyntaxChecker(yylineno, NULL);
+	//fprintf(stderr, "error!\n");
 }
 

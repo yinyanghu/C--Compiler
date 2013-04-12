@@ -73,7 +73,11 @@ extern int yydebug;
      IF = 282,
      ELSE = 283,
      WHILE = 284,
-     LOWER_THAN_ELSE = 285
+     LC_RC = 285,
+     LOWER_THAN_ELSE = 286,
+     DEF_EMPTY = 287,
+     STMT_ERROR = 288,
+     DEF_ERROR = 289
    };
 #endif
 
@@ -82,7 +86,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2058 of yacc.c  */
-#line 11 "syntax.y"
+#line 12 "syntax.y"
 
 	int						key_int;
 	float					key_float;
@@ -115,7 +119,7 @@ typedef union YYSTYPE
 
 
 /* Line 2058 of yacc.c  */
-#line 119 "syntax.tab.h"
+#line 123 "syntax.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -65,13 +65,11 @@ struct ExtDef_A
 {
 	struct Specifier	*specifier;
 	struct ExtDecList	*extdeflist;
-	/* SEMI */
 };
 
 struct ExtDef_B
 {
 	struct Specifier	*specifier;
-	/* SEMI */
 };
 
 
