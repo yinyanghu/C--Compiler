@@ -99,12 +99,8 @@
 %left		STAR DIV
 %right		NOT
 %left		LB RB LP RP DOT
-%nonassoc	LC_RC
 %nonassoc	LOWER_THAN_ELSE
 %nonassoc	ELSE
-%nonassoc	DEF_EMPTY
-%nonassoc	STMT_ERROR
-%nonassoc	DEF_ERROR
 
 
 %start		Program
@@ -142,10 +138,22 @@ ExtDef				:	Specifier ExtDecList SEMI
 						}
 					|	error SEMI
 						{
+							SyntaxErrorReport(yylineno, "Invaild defination before ';' token");
 							yyerrok;
 						}
 					|	error ExtDef
 						{
+							SyntaxErrorReport(yylineno, "Expected a ';' token");
+							yyerrok;
+						}
+					|	error FunDec CompSt
+						{
+							SyntaxErrorReport(yylineno, "Expected 'int' or 'float' before the function name");
+							yyerrok;
+						}
+					|	Specifier FunDec error
+						{
+							SyntaxErrorReport(yylineno, "Expected '{' and '}' in this funtion");
 							yyerrok;
 						}
 					;
@@ -182,6 +190,11 @@ StructSpecifier		:	STRUCT OptTag LC DefList RC
 						{
 							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_B($2), &Visit_StructSpecifier_B, @$.first_line);
 						}
+					|	STRUCT OptTag LC error RC
+						{
+							SyntaxErrorReport(yylineno, "Some errors in this declaration of struct");
+							yyerrok;
+						}
 					;
 
 OptTag				:	ID
@@ -216,6 +229,7 @@ VarDec				:	ID
 						}
 					|	VarDec LB error RB
 						{
+							SyntaxErrorReport(yylineno, "Expected a expression before ']' token");
 							yyerrok;
 						}
 					;
@@ -230,10 +244,7 @@ FunDec				:	ID LP VarList RP
 						}
 					|	ID LP error RP
 						{
-							yyerrok;
-						}
-					|	error LP VarList RP
-						{
+							SyntaxErrorReport(yylineno, "Some errors in the parameters of this function");
 							yyerrok;
 						}
 					;
@@ -258,10 +269,6 @@ ParamDec			:	Specifier VarDec
 CompSt				:	LC DefList StmtList RC
 						{
 							$$ = Build_CompSt($2, $3, @$.first_line);
-						}
-					|	Exp error RC
-						{
-							yyerrok;
 						}
 					;
 
@@ -299,8 +306,39 @@ Stmt				:	Exp SEMI
 						{
 							$$ = Build_Stmt((void *)Build_Stmt_While($3, $5), &Visit_Stmt_While, @$.first_line);
 						}
+					|	RETURN error SEMI
+						{
+							SyntaxErrorReport(yylineno, "Expected a expression before ';' token");
+							yyerrok;
+						}
+					|	RETURN Exp error
+						{
+							SyntaxErrorReport(yylineno, "Expected a ';' token");
+							yyerrok;
+						}
+					|	IF LP error RP Stmt %prec LOWER_THAN_ELSE
+						{
+							SyntaxErrorReport(yylineno, "Expected a expression before ')' token");
+							yyerrok;
+						}
+					|	IF LP error RP Stmt ELSE Stmt
+						{
+							SyntaxErrorReport(yylineno, "Expected a expression before ')' token");
+							yyerrok;
+						}
+					|	WHILE LP error RP Stmt
+						{
+							SyntaxErrorReport(yylineno, "Expected a expression before ')' token");
+							yyerrok;
+						}
 					|	error SEMI
 						{
+							SyntaxErrorReport(yylineno, "Expected a expression before ';' token / Expected a ';' token");
+							yyerrok;
+						}
+					|	Exp error
+						{
+							SyntaxErrorReport(yylineno, "Expected a ';' token / Invaild Expression");
 							yyerrok;
 						}
 					;
@@ -321,6 +359,12 @@ Def					:	Specifier DecList SEMI
 						}
 					|	Specifier error SEMI
 						{
+							SyntaxErrorReport(yylineno, "Invaild defination before ';' token");
+							yyerrok;
+						}
+					|	Specifier DecList error
+						{
+							SyntaxErrorReport(yylineno, "Expected a ';' token");
 							yyerrok;
 						}
 					;
@@ -422,10 +466,12 @@ Exp					:	Exp ASSIGNOP Exp
 						}
 					|	LP error RP
 						{
+							SyntaxErrorReport(yylineno, "Expected a expression before ')' token");
 							yyerrok;
 						}
 					|	Exp LB error RB
 						{
+							SyntaxErrorReport(yylineno, "Expected a expression before ']' token");
 							yyerrok;
 						}
 					;

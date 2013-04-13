@@ -3,8 +3,12 @@
 
 int LastErrorLineno = -1;
 
-void SyntaxErrorReport(char *message)
+int LastErrorReport = -1;
+
+void SyntaxErrorReport(int lineno, char *message)
 {
+	if (lineno == LastErrorReport) return;
+	LastErrorReport = lineno;
 	fprintf(stderr, "\t%s\n", message);
 }
 

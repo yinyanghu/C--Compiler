@@ -4,6 +4,13 @@ struct pp
 };
 
 int k, s, t;
+int tt;
+
+int a()
+{
+}
+
+
 
 struct kk
 {
@@ -16,7 +23,7 @@ int m;
 
 int ss(int k, int b, int c,struct ss sd, int s)
 {
-	ss = 2
+	ss = 2;
 }
 
 float A[23];
@@ -32,8 +39,8 @@ int f()
 		while (j == 0)
 			if (k == 0) sdfsdl; else sdfsdf;
 	
-	a = a + 1;
-	a = a - 1 + 1 * 2;
+	a = (a) + 1;
+	a = a - a + 1 * 2;
 	a = a / b;
 	a = !a;
 	c = f(sdf, sei, 3, 0, NULL);
@@ -49,7 +56,7 @@ int main()
 {
 	int a, b, c;
 	while (1)
-		t(s);
+		s(s);
 	f = -2;
 	a = f();
 	return 0;

@@ -13,7 +13,7 @@ int ErrorCounter;
 
 int main(int argc, char **argv)
 {
-	yydebug = 1;
+	/*yydebug = 1;*/
 
 	if (argc != 2)
 	{

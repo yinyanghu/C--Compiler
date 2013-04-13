@@ -9,7 +9,7 @@
 #define PURPLE	"\E[1;35m"
 #define NORMAL	"\E[m"
 
-#define GLOBAL_COLOR
+//#define GLOBAL_COLOR
 
 
 #define STRING_SIZE		20
