@@ -57,7 +57,7 @@ id				{letter}+({letter}|{digit})*
 
 <C_COMMENT>"/*"			{
 							//printf("Error: /* is nested!\n");
-							LexChecker(yylineno, yytext, "/* is nested!", "Ignore!");
+							LexChecker(yylineno, yytext, "Nested", "Ignore!");
 						}
 
 <C_COMMENT>"*/"			{ BEGIN(INITIAL); }
@@ -66,6 +66,10 @@ id				{letter}+({letter}|{digit})*
 "//".*\n		{}
 
 "/*"			{ BEGIN(C_COMMENT); }
+
+"*/"			{
+					LexChecker(yylineno, yytext, "No matching '/*' for", "Ignore!");
+				}
 
 ";"				{
 					//printf("SEMI\n");

@@ -1,7 +1,7 @@
-int k
+int k;
 int s(int k, int b, int c)
 {
-	int ss;
+	int ss
 }
 
 int main()

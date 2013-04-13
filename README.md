@@ -6,14 +6,26 @@ A simplified C Compiler
 
 * [x] Basic Framework
 * [x] Lexical Analyser
-* [ ] Syntax Analyser
+* [x] Syntax Analyser
 
 
 ## Timeline
 
+* April 13, 2013:
+
+> Syntax Analyser: Error Recovery ==> Completed!
+
+> Lab1 ==> Completed!
+
+* April 12, 2013: 
+
+> Syntax Analyser: Error Recovery
+
 * April 7, 2013
 
 > Syntax Analyser: Abstract Syntax Tree ==> Completed!
+
+> Syntax Analyser: Error Recovery
 
 * April 6, 2013
 

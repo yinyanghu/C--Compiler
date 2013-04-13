@@ -5,7 +5,7 @@ int a()
 {
 	ss = 2;
 	//int s = 3;
-	ss = 3;
+	ss = 3
 	tt = 2;
 }
 
