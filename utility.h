@@ -22,10 +22,10 @@
 						--indent;
 #define LINE(V)			printf(" (%d)", TreeNode_GetLineno(&(V -> tree)));
 
-void print_indent(int x);
+void print_indent(int);
 
-int String_to_Int(int string_type, char *string_digit);
+int String_to_Int(int, char *);
 
-float String_to_Float(char *string_digit);
+float String_to_Float(char *);
 
 #endif

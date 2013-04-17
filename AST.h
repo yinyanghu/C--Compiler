@@ -3,10 +3,8 @@
 
 //#include "list.h"
 #include "const.h"
-#include "utility.h"
-#include <stdlib.h>
-#include <string.h>
 
+#define STRING_SIZE		20
 
 int indent;
 
@@ -15,9 +13,9 @@ struct TreeNode
 	int lineno;
 };
 
-int TreeNode_GetLineno(struct TreeNode *ptr);
+int TreeNode_GetLineno(struct TreeNode *);
 
-void TreeNode_SetLineno(struct TreeNode *ptr, int key);
+void TreeNode_SetLineno(struct TreeNode *, int);
 
 
 
@@ -466,153 +464,153 @@ struct ID
 
 
 
-struct Program				*Build_Program(struct ExtDefList *child, int lineno);
+struct Program				*Build_Program(struct ExtDefList *, int);
 
-struct ExtDefList			*Build_ExtDefList(struct ExtDef *child_A, struct ExtDefList *child_B, int lineno);
+struct ExtDefList			*Build_ExtDefList(struct ExtDef *, struct ExtDefList *, int);
 
-struct ExtDef				*Build_ExtDef(void *child, void (*func_visit)(void *), int lineno);
+struct ExtDef				*Build_ExtDef(void *, void (*)(void *), int);
 
-struct ExtDef_A				*Build_ExtDef_A(struct Specifier *child_A, struct ExtDecList *child_B);
+struct ExtDef_A				*Build_ExtDef_A(struct Specifier *, struct ExtDecList *);
 
-struct ExtDef_B				*Build_ExtDef_B(struct Specifier *child);
+struct ExtDef_B				*Build_ExtDef_B(struct Specifier *);
 
-struct ExtDef_C				*Build_ExtDef_C(struct Specifier *child_A, struct FunDec *child_B, struct CompSt *child_C);
+struct ExtDef_C				*Build_ExtDef_C(struct Specifier *, struct FunDec *, struct CompSt *);
 
-struct ExtDecList			*Build_ExtDecList(struct VarDec *child_A, struct ExtDecList *child_B, int lineno);
+struct ExtDecList			*Build_ExtDecList(struct VarDec *, struct ExtDecList *, int);
 
-struct Specifier			*Build_Specifier(void *child, void (*func_visit)(void *), int lineno);
+struct Specifier			*Build_Specifier(void *, void (*)(void *), int);
 
-struct Specifier_A			*Build_Specifier_A(DataType child);
+struct Specifier_A			*Build_Specifier_A(DataType);
 
-struct Specifier_B			*Build_Specifier_B(struct StructSpecifier *child);
+struct Specifier_B			*Build_Specifier_B(struct StructSpecifier *);
 
-struct StructSpecifier		*Build_StructSpecifier(void *child, void (*func_visit)(void *), int lineno);
+struct StructSpecifier		*Build_StructSpecifier(void *, void (*)(void *), int);
 
-struct StructSpecifier_A	*Build_StructSpecifier_A(struct OptTag *child_A, struct DefList *child_B);
+struct StructSpecifier_A	*Build_StructSpecifier_A(struct OptTag *, struct DefList *);
 
-struct StructSpecifier_B	*Build_StructSpecifier_B(struct Tag *child);
+struct StructSpecifier_B	*Build_StructSpecifier_B(struct Tag *);
 
-struct OptTag				*Build_OptTag(struct ID *child, int lineno);
+struct OptTag				*Build_OptTag(struct ID *, int);
 
-struct Tag					*Build_Tag(struct ID *child, int lineno);
+struct Tag					*Build_Tag(struct ID *, int);
 
-struct VarDec				*Build_VarDec(void *child, void (*func_visit)(void *), int lineno);
+struct VarDec				*Build_VarDec(void *, void (*)(void *), int);
 
-struct VarDec_A				*Build_VarDec_A(struct ID *child);
+struct VarDec_A				*Build_VarDec_A(struct ID *);
 
-struct VarDec_B				*Build_VarDec_B(struct VarDec *child_A, struct TYPE_INT *child_B);
+struct VarDec_B				*Build_VarDec_B(struct VarDec *, struct TYPE_INT *);
 
-struct FunDec				*Build_FunDec(struct ID *child_A, struct VarList *child_B, int lineno);
+struct FunDec				*Build_FunDec(struct ID *, struct VarList *, int);
 
-struct VarList				*Build_VarList(struct ParamDec *child_A, struct VarList *child_B, int lineno);
+struct VarList				*Build_VarList(struct ParamDec *, struct VarList *, int);
 
-struct ParamDec				*Build_ParamDec(struct Specifier *child_A, struct VarDec *child_B, int lineno);
+struct ParamDec				*Build_ParamDec(struct Specifier *, struct VarDec *, int);
 
-struct CompSt				*Build_CompSt(struct DefList *child_A, struct StmtList *child_B, int lineno);
+struct CompSt				*Build_CompSt(struct DefList *, struct StmtList *, int);
 
-struct StmtList				*Build_StmtList(struct Stmt *child_A, struct StmtList *child_B, int lineno);
+struct StmtList				*Build_StmtList(struct Stmt *, struct StmtList *, int);
 
-struct Stmt					*Build_Stmt(void *child, void (*func_visit)(void *), int lineno);
+struct Stmt					*Build_Stmt(void *, void (*)(void *), int);
 
-struct Stmt_Exp				*Build_Stmt_Exp(struct Exp *child);
+struct Stmt_Exp				*Build_Stmt_Exp(struct Exp *);
 
-struct Stmt_CompSt			*Build_Stmt_CompSt(struct CompSt *child);
+struct Stmt_CompSt			*Build_Stmt_CompSt(struct CompSt *);
 
-struct Stmt_Return			*Build_Stmt_Return(struct Exp *child);
+struct Stmt_Return			*Build_Stmt_Return(struct Exp *);
 
-struct Stmt_If				*Build_Stmt_If(struct Exp *child_A, struct Stmt *child_B);
+struct Stmt_If				*Build_Stmt_If(struct Exp *, struct Stmt *);
 
-struct Stmt_If_Else			*Build_Stmt_If_Else(struct Exp *child_A, struct Stmt *child_B, struct Stmt *child_C);
+struct Stmt_If_Else			*Build_Stmt_If_Else(struct Exp *, struct Stmt *, struct Stmt *);
 
-struct Stmt_While			*Build_Stmt_While(struct Exp *child_A, struct Stmt *child_B);
+struct Stmt_While			*Build_Stmt_While(struct Exp *, struct Stmt *);
 
-struct DefList				*Build_DefList(struct Def *child_A, struct DefList *child_B, int lineno);
+struct DefList				*Build_DefList(struct Def *, struct DefList *, int);
 
-struct Def					*Build_Def(struct Specifier *child_A, struct DecList *child_B, int lineno);
+struct Def					*Build_Def(struct Specifier *, struct DecList *, int);
 
-struct DecList				*Build_DecList(struct Dec *child_A, struct DecList *child_B, int lineno);
+struct DecList				*Build_DecList(struct Dec *, struct DecList *, int);
 
-struct Dec					*Build_Dec(struct VarDec *child_A, struct Exp *child_B, int lineno);
+struct Dec					*Build_Dec(struct VarDec *, struct Exp *, int);
 
-struct Exp					*Build_Exp(void *child, void (*func_visit)(void *), int lineno);
+struct Exp					*Build_Exp(void *, void (*)(void *), int);
 
-struct Exp_Assign			*Build_Exp_Assign(struct Exp *child_A, struct Exp *child_B);
+struct Exp_Assign			*Build_Exp_Assign(struct Exp *, struct Exp *);
 
-struct Exp_Binary_Rel		*Build_Exp_Binary_Rel(struct Exp *child_A, struct Exp *child_B, BinaryOP_Relop child_C);
+struct Exp_Binary_Rel		*Build_Exp_Binary_Rel(struct Exp *, struct Exp *, BinaryOP_Relop);
 
-struct Exp_Binary_Cal		*Build_Exp_Binary_Cal(struct Exp *child_A, struct Exp *child_B, BinaryOP_Calop child_C);
+struct Exp_Binary_Cal		*Build_Exp_Binary_Cal(struct Exp *, struct Exp *, BinaryOP_Calop);
 
-struct Exp_Unary			*Build_Exp_Unary(struct Exp *child_A, UnaryOP child_B);
+struct Exp_Unary			*Build_Exp_Unary(struct Exp *, UnaryOP);
 
-struct Exp_Function			*Build_Exp_Function(struct ID *child_A, struct Args *child_B);
+struct Exp_Function			*Build_Exp_Function(struct ID *, struct Args *);
 
-struct Exp_Array			*Build_Exp_Array(struct Exp *child_A, struct Exp *child_B);
+struct Exp_Array			*Build_Exp_Array(struct Exp *, struct Exp *);
 
-struct Exp_Attribute		*Build_Exp_Attribute(struct Exp *child_A, struct ID *child_B);
+struct Exp_Attribute		*Build_Exp_Attribute(struct Exp *, struct ID *);
 
-struct Exp_Variable			*Build_Exp_Variable(struct ID *child);
+struct Exp_Variable			*Build_Exp_Variable(struct ID *);
 
-struct TYPE_INT				*Build_TYPE_INT(int child);
+struct TYPE_INT				*Build_TYPE_INT(int);
 
-struct TYPE_FLOAT			*Build_TYPE_FLOAT(float child);
+struct TYPE_FLOAT			*Build_TYPE_FLOAT(float);
 
-struct Args					*Build_Args(struct Exp *child_A, struct Args *child_B, int lineno);
+struct Args					*Build_Args(struct Exp *, struct Args *, int);
 
-struct ID					*Build_ID(char *child);
-
-
+struct ID					*Build_ID(char *);
 
 
-void Visit_Program(struct Program *v);
-void Visit_ExtDefList(struct ExtDefList *v);
-void Visit_ExtDef(struct ExtDef *v);
-void Visit_ExtDef_A(void *v);
-void Visit_ExtDef_B(void *v);
-void Visit_ExtDef_C(void *v);
-void Visit_ExtDecList(struct ExtDecList *v);
-void Visit_Specifier(struct Specifier *v);
-void Visit_Specifier_A(void *v);
-void Visit_Specifier_B(void *v);
-void Visit_StructSpecifier(struct StructSpecifier *v);
-void Visit_StructSpecifier_A(void *v);
-void Visit_StructSpecifier_B(void *v);
-void Visit_OptTag(struct OptTag *v);
-void Visit_Tag(struct Tag *v);
-void Visit_VarDec(struct VarDec *v);
-void Visit_VarDec_A(void *v);
-void Visit_VarDec_B(void *v);
-void Visit_FunDec(struct FunDec *v);
-void Visit_VarList(struct VarList *v);
-void Visit_ParamDec(struct ParamDec *v);
-void Visit_CompSt(struct CompSt *v);
-void Visit_StmtList(struct StmtList *v);
-void Visit_Stmt(struct Stmt *v);
-void Visit_Stmt_Exp(void *v);
-void Visit_Stmt_CompSt(void *v);
-void Visit_Stmt_Return(void *v);
-void Visit_Stmt_If(void *v);
-void Visit_Stmt_If_Else(void *v);
-void Visit_Stmt_While(void *v);
-void Visit_DefList(struct DefList *v);
-void Visit_Def(struct Def *v);
-void Visit_DecList(struct DecList *v);
-void Visit_Dec(struct Dec *v);
-void Visit_Exp(struct Exp *v);
-void Visit_Exp_Assign(void *v);
-void Visit_Exp_Binary_Rel(void *v);
-void Visit_Exp_Binary_Cal(void *v);
-void Visit_Exp_Unary(void *v);
-void Visit_Exp_Function(void *v);
-void Visit_Exp_Array(void *v);
-void Visit_Exp_Attribute(void *v);
-void Visit_Exp_Variable(void *v);
-void Visit_TYPE_INT(void *v);
-void Visit_TYPE_FLOAT(void *v);
-void Visit_Args(struct Args *v);
-void Visit_ID(void *v);
-void Visit_DataType(DataType v);
-void Visit_BinaryOP_Calop(BinaryOP_Calop v);
-void Visit_UnaryOP(UnaryOP v);
+
+
+void Visit_Program(struct Program *);
+void Visit_ExtDefList(struct ExtDefList *);
+void Visit_ExtDef(struct ExtDef *);
+void Visit_ExtDef_A(void *);
+void Visit_ExtDef_B(void *);
+void Visit_ExtDef_C(void *);
+void Visit_ExtDecList(struct ExtDecList *);
+void Visit_Specifier(struct Specifier *);
+void Visit_Specifier_A(void *);
+void Visit_Specifier_B(void *);
+void Visit_StructSpecifier(struct StructSpecifier *);
+void Visit_StructSpecifier_A(void *);
+void Visit_StructSpecifier_B(void *);
+void Visit_OptTag(struct OptTag *);
+void Visit_Tag(struct Tag *);
+void Visit_VarDec(struct VarDec *);
+void Visit_VarDec_A(void *);
+void Visit_VarDec_B(void *);
+void Visit_FunDec(struct FunDec *);
+void Visit_VarList(struct VarList *);
+void Visit_ParamDec(struct ParamDec *);
+void Visit_CompSt(struct CompSt *);
+void Visit_StmtList(struct StmtList *);
+void Visit_Stmt(struct Stmt *);
+void Visit_Stmt_Exp(void *);
+void Visit_Stmt_CompSt(void *);
+void Visit_Stmt_Return(void *);
+void Visit_Stmt_If(void *);
+void Visit_Stmt_If_Else(void *);
+void Visit_Stmt_While(void *);
+void Visit_DefList(struct DefList *);
+void Visit_Def(struct Def *);
+void Visit_DecList(struct DecList *);
+void Visit_Dec(struct Dec *);
+void Visit_Exp(struct Exp *);
+void Visit_Exp_Assign(void *);
+void Visit_Exp_Binary_Rel(void *);
+void Visit_Exp_Binary_Cal(void *);
+void Visit_Exp_Unary(void *);
+void Visit_Exp_Function(void *);
+void Visit_Exp_Array(void *);
+void Visit_Exp_Attribute(void *);
+void Visit_Exp_Variable(void *);
+void Visit_TYPE_INT(void *);
+void Visit_TYPE_FLOAT(void *);
+void Visit_Args(struct Args *);
+void Visit_ID(void *);
+void Visit_DataType(DataType);
+void Visit_BinaryOP_Calop(BinaryOP_Calop);
+void Visit_UnaryOP(UnaryOP);
 
 
 

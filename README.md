@@ -7,9 +7,14 @@ A simplified C Compiler
 * [x] Basic Framework
 * [x] Lexical Analyser
 * [x] Syntax Analyser
+* [ ] Semantic Analyser
 
 
 ## Timeline
+
+* April 18, 2013:
+
+> Semantic Analyser: Symbols Table, Basic Framework
 
 * April 13, 2013:
 

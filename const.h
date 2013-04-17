@@ -11,8 +11,28 @@
 
 //#define GLOBAL_COLOR
 
-
-#define STRING_SIZE		20
+typedef enum
+{
+	VarUndefined,				// 1
+	FuncUndefined,				// 2
+	VarMultiDefined,			// 3
+	FuncMultiDefined,			// 4
+	ExpMismatch,				// 5
+	LeftValueError,				// 6
+	OpTypeMismatch,				// 7
+	ReturnMismatch,				// 8
+	FuncParameterMismatch,		// 9
+	ArrayOpError,				// 10
+	FuncCallOpError,			// 11
+	ArrayAccessError,			// 12
+	StructAttributeError,		// 13
+	AccessStructUndefinedField,	// 14
+	StructDefineError,			// 15
+	StructMultiDefined,			// 16
+	StructUndefined,			// 17
+	FuncDeclareButUndefined,	// 18
+	FuncDefineConflict			// 19
+} SemanticErrorType;
 
 typedef enum
 {

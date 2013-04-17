@@ -1,4 +1,8 @@
 #include "AST.h"
+#include "utility.h"
+#include "SymbolsTable.h"
+#include <stdlib.h>
+#include <string.h>
 
 /* TreeNode */
 
@@ -476,6 +480,7 @@ struct TYPE_INT *Build_TYPE_INT(int child)
 	struct TYPE_INT		*ptr = (struct TYPE_INT *)malloc(sizeof(struct TYPE_INT));
 
 	ptr -> key = child;
+	STNUM_insert(STNUM, Make_Constant(TYPE_INT, child, 0));
 
 	return ptr;
 }
@@ -485,6 +490,7 @@ struct TYPE_FLOAT *Build_TYPE_FLOAT(float child)
 	struct TYPE_FLOAT	*ptr = (struct TYPE_FLOAT *)malloc(sizeof(struct TYPE_FLOAT));
 
 	ptr -> key = child;
+	STNUM_insert(STNUM, Make_Constant(TYPE_FLOAT, 0, child));
 
 	return ptr;
 }
@@ -505,6 +511,8 @@ struct ID *Build_ID(char *child)
 	struct ID		*ptr = (struct ID *)malloc(sizeof(struct ID));
 
 	strcpy(ptr -> name, child);
+
+	STID_insert(STID, child);
 
 	return ptr;
 }

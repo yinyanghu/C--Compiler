@@ -1,5 +1,6 @@
 #include "SyntaxChecker.h"
 #include "const.h"
+#include <stdio.h>
 
 int LastErrorLineno = -1;
 

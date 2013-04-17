@@ -1,6 +1,5 @@
 #include "utility.h"
 
-
 void print_indent(int x)
 {
 	while (x --)
