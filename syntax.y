@@ -3,6 +3,7 @@
 	#include "lex.yy.c"
 	#include "AST.h"
 	#include "SyntaxChecker.h"
+	#include "SemanticChecker.h"
 
 	extern struct Program	*AST;
 	void yyerror(const char *msg);
@@ -126,15 +127,15 @@ ExtDefList			:	ExtDef ExtDefList
 
 ExtDef				:	Specifier ExtDecList SEMI
 						{
-							$$ = Build_ExtDef((void *)Build_ExtDef_A($1, $2), &Visit_ExtDef_A, @$.first_line);
+							$$ = Build_ExtDef((void *)Build_ExtDef_A($1, $2), &Visit_ExtDef_A, &SemanticCheck_ExtDef_A, @$.first_line);
 						}
 					|	Specifier SEMI
 						{
-							$$ = Build_ExtDef((void *)Build_ExtDef_B($1), &Visit_ExtDef_B, @$.first_line);
+							$$ = Build_ExtDef((void *)Build_ExtDef_B($1), &Visit_ExtDef_B, &SemanticCheck_ExtDef_B, @$.first_line);
 						}
 					|	Specifier FunDec CompSt
 						{
-							$$ = Build_ExtDef((void *)Build_ExtDef_C($1, $2, $3), &Visit_ExtDef_C, @$.first_line);
+							$$ = Build_ExtDef((void *)Build_ExtDef_C($1, $2, $3), &Visit_ExtDef_C, &SemanticCheck_ExtDef_C, @$.first_line);
 						}
 					|	error SEMI
 						{
@@ -174,21 +175,21 @@ ExtDecList			:	VarDec
 
 Specifier			:	TYPE
 						{
-							$$ = Build_Specifier((void *)Build_Specifier_A($1), &Visit_Specifier_A, @$.first_line);	
+							$$ = Build_Specifier((void *)Build_Specifier_A($1), &Visit_Specifier_A, &SemanticCheck_Specifier_A, @$.first_line);	
 						}
 					|	StructSpecifier
 						{
-							$$ = Build_Specifier((void *)Build_Specifier_B($1), &Visit_Specifier_B, @$.first_line);	
+							$$ = Build_Specifier((void *)Build_Specifier_B($1), &Visit_Specifier_B, &SemanticCheck_Specifier_B, @$.first_line);	
 						}
 					;
 
 StructSpecifier		:	STRUCT OptTag LC DefList RC
 						{
-							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_A($2, $4), &Visit_StructSpecifier_A, @$.first_line);
+							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_A($2, $4), &Visit_StructSpecifier_A, &SemanticCheck_StructSpecifier_A, @$.first_line);
 						}
 					|	STRUCT Tag
 						{
-							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_B($2), &Visit_StructSpecifier_B, @$.first_line);
+							$$ = Build_StructSpecifier((void *)Build_StructSpecifier_B($2), &Visit_StructSpecifier_B, &SemanticCheck_StructSpecifier_B, @$.first_line);
 						}
 					|	STRUCT OptTag LC error RC
 						{
@@ -221,11 +222,11 @@ Tag					:	ID
 
 VarDec				:	ID
 						{
-							$$ = Build_VarDec((void *)Build_VarDec_A(Build_ID($1)), &Visit_VarDec_A, @$.first_line);
+							$$ = Build_VarDec((void *)Build_VarDec_A(Build_ID($1)), &Visit_VarDec_A, &SemanticCheck_VarDec_A, &SemanticCheck_Structure_VarDec_A, &SemanticCheck_Parameter_VarDec_A, @$.first_line);
 						}
 					|	VarDec LB INT RB
 						{
-							$$ = Build_VarDec((void *)Build_VarDec_B($1, Build_TYPE_INT($3)), &Visit_VarDec_B, @$.first_line);
+							$$ = Build_VarDec((void *)Build_VarDec_B($1, Build_TYPE_INT($3)), &Visit_VarDec_B, &SemanticCheck_VarDec_B, &SemanticCheck_Structure_VarDec_B, &SemanticCheck_Parameter_VarDec_B, @$.first_line);
 						}
 					|	VarDec LB error RB
 						{

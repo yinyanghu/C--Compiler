@@ -1,6 +1,5 @@
 #include "AST.h"
 #include "utility.h"
-#include "SymbolsTable.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,13 +40,15 @@ struct ExtDefList *Build_ExtDefList(struct ExtDef *child_A, struct ExtDefList *c
 	return ptr;
 }
 
-struct ExtDef *Build_ExtDef(void *child, void (*func_visit)(void *), int lineno)
+struct ExtDef *Build_ExtDef(void *child, void (*func_visit)(void *), void (*func_sc)(void *), int lineno)
 {
 	struct ExtDef	*ptr = (struct ExtDef *)malloc(sizeof(struct ExtDef));
 
 	TreeNode_SetLineno(&(ptr -> tree), lineno);
 	ptr -> next = child;
+
 	ptr -> Visit = func_visit;
+	ptr -> SemanticCheck = func_sc;
 
 	return ptr;
 }
@@ -57,7 +58,7 @@ struct ExtDef_A *Build_ExtDef_A(struct Specifier *child_A, struct ExtDecList *ch
 	struct ExtDef_A		*ptr = (struct ExtDef_A *)malloc(sizeof(struct ExtDef_A));
 
 	ptr -> specifier = child_A;
-	ptr -> extdeflist = child_B;
+	ptr -> extdeclist = child_B;
 
 	return ptr;
 }
@@ -95,13 +96,15 @@ struct ExtDecList *Build_ExtDecList(struct VarDec *child_A, struct ExtDecList *c
 }
 
 
-struct Specifier *Build_Specifier(void *child, void (*func_visit)(void *), int lineno)
+struct Specifier *Build_Specifier(void *child, void (*func_visit)(void *), struct TYPE *(*func_sc)(void *), int lineno)
 {
 	struct Specifier	*ptr = (struct Specifier *)malloc(sizeof(struct Specifier));
 
 	TreeNode_SetLineno(&(ptr -> tree), lineno);
 	ptr -> next = child;
+
 	ptr -> Visit = func_visit;
+	ptr -> SemanticCheck = func_sc;
 
 	return ptr;
 }
@@ -126,14 +129,16 @@ struct Specifier_B *Build_Specifier_B(struct StructSpecifier *child)
 }
 
 
-struct StructSpecifier *Build_StructSpecifier(void *child, void (*func_visit)(void *), int lineno)
+struct StructSpecifier *Build_StructSpecifier(void *child, void (*func_visit)(void *), struct StructureType *(*func_sc)(void *), int lineno)
 {
 	struct StructSpecifier	*ptr = (struct StructSpecifier *)malloc(sizeof(struct StructSpecifier));
 
 	TreeNode_SetLineno(&(ptr -> tree), lineno);
 
 	ptr -> next = child;
+
 	ptr -> Visit = func_visit;
+	ptr -> SemanticCheck = func_sc;
 
 	return ptr;
 }
@@ -180,13 +185,17 @@ struct Tag *Build_Tag(struct ID *child, int lineno)
 }
 
 
-struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), int lineno)
+struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct SymbolsTable *(*func_sc)(void *, struct TYPE *), struct StructureType *(*func_ssc)(void *, struct TYPE *), struct Parameter *(*func_spc)(void *, struct TYPE *), int lineno)
 {
 	struct VarDec	*ptr = (struct VarDec *)malloc(sizeof(struct VarDec));
 
 	TreeNode_SetLineno(&(ptr -> tree), lineno);
 	ptr -> next = child;
+
 	ptr -> Visit = func_visit;
+	ptr -> SemanticCheck = func_sc;
+	ptr -> SemanticStructCheck = func_ssc;
+	ptr -> SemanticParameterCheck = func_spc;
 
 	return ptr;
 }
@@ -480,7 +489,6 @@ struct TYPE_INT *Build_TYPE_INT(int child)
 	struct TYPE_INT		*ptr = (struct TYPE_INT *)malloc(sizeof(struct TYPE_INT));
 
 	ptr -> key = child;
-	STNUM_insert(STNUM, Make_Constant(TYPE_INT, child, 0));
 
 	return ptr;
 }
@@ -490,7 +498,6 @@ struct TYPE_FLOAT *Build_TYPE_FLOAT(float child)
 	struct TYPE_FLOAT	*ptr = (struct TYPE_FLOAT *)malloc(sizeof(struct TYPE_FLOAT));
 
 	ptr -> key = child;
-	STNUM_insert(STNUM, Make_Constant(TYPE_FLOAT, 0, child));
 
 	return ptr;
 }
@@ -511,8 +518,6 @@ struct ID *Build_ID(char *child)
 	struct ID		*ptr = (struct ID *)malloc(sizeof(struct ID));
 
 	strcpy(ptr -> name, child);
-
-	STID_insert(STID, child);
 
 	return ptr;
 }
@@ -567,7 +572,7 @@ void Visit_ExtDef_A(void *v)
 	struct ExtDef_A		*ptr = (struct ExtDef_A *)v;
 
 	Visit_Specifier(ptr -> specifier);
-	Visit_ExtDecList(ptr -> extdeflist);
+	Visit_ExtDecList(ptr -> extdeclist);
 
 	IPrint("SEMI");
 }

@@ -8,9 +8,9 @@ LIB	= -lfl -ly
 Object = LexChecker.o \
 		 SyntaxChecker.o \
 		 utility.o \
+		 SemanticChecker.o \
 		 AST.o \
 		 SymbolsTable.o \
-		 SemanticChecker.o \
 		 syntax.tab.o \
 		 main.o
 

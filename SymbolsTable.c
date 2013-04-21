@@ -1,9 +1,18 @@
 #include "SymbolsTable.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct SymbolsTableID		*STID[HashingPrime];
-struct SymbolsTableNumber	*STNUM[HashingPrime];
+struct SymbolsTable			*ST[HashingPrime];
+struct ScopeType			Scope;
+
+
+struct SymbolsTable			*SST[HashingPrime];
+struct ScopeType			StructScope;
+
+
+struct DynamicStructureTable	*DST;
+int		DST_Scope;
 
 
 // BKDR Hash Function
@@ -17,45 +26,234 @@ int StringHashing(char *str)
 	return ((hash & 0x7FFFFFFF) % HashingPrime);
 }
 
-struct SymbolsTableID *STID_insert(struct SymbolsTableID **List, char *id)
+struct SymbolsTable *ST_insert(struct SymbolsTable **List, char *id, struct ScopeType *Scope)
 {
-	struct SymbolsTableID *ptr;
-	if ((ptr = STID_find(List, id)) != NULL) return ptr;
+	struct SymbolsTable *ptr = (struct SymbolsTable *)malloc(sizeof(struct SymbolsTable));
+	//if ((ptr = ST_find(List, id)) != NULL) return ptr;
 
-	ptr = (struct SymbolsTableID *)malloc(sizeof(struct SymbolsTableID));
 	strcpy(ptr -> name, id);
+	ptr -> scope = Scope_current(Scope);
+	ptr -> attr = NULL;
 
 	int f = StringHashing(id);
 	ptr -> next = List[f] -> next;
+	ptr -> prev = List[f];
+	if (List[f] -> next != NULL)
+		List[f] -> next -> prev = ptr;
 	List[f] -> next = ptr;
+
+	Scope_insert(Scope, ptr);
 
 	return ptr;
 }
 
-struct SymbolsTableID *STID_find(struct SymbolsTableID **List, char *id)
+void ST_remove(struct SymbolsTable *ptr)
+{
+	ptr -> prev -> next = ptr -> next;
+	if (ptr -> next != NULL)
+		ptr -> next -> prev = ptr -> prev;
+	free(ptr);
+}
+
+struct SymbolsTable *ST_find(struct SymbolsTable **List, char *id)
 {
 	int f = StringHashing(id);
-	struct SymbolsTableID	*ptr;
-	for (ptr = List[f]; ptr != NULL; ptr = ptr -> next)
+	struct SymbolsTable	*ptr;
+
+	for (ptr = List[f] -> next; ptr != NULL; ptr = ptr -> next)
 		if (strcmp(id, ptr -> name) == 0) return ptr;
 	return NULL;
 }
 
+struct SymbolsTable *ST_find_scope(struct SymbolsTable **List, char *id, struct ScopeType *scope)
+{
+	int current = Scope_current(scope);
+
+	int f = StringHashing(id);
+	struct SymbolsTable *ptr;
+
+	for (ptr = List[f] -> next; ptr != NULL; ptr = ptr -> next)
+		if (ptr -> scope == current && strcmp(id, ptr -> name) == 0) return ptr;
+	return NULL;
+}
+
 /* Just for Fun! */
-int STID_Test(struct SymbolsTableID **List)
+int ST_Test(struct SymbolsTable **List)
 {
 	int i, ret = 0;
-	struct SymbolsTableID	*ptr;
+	struct SymbolsTable	*ptr;
 	for (i = 0; i < HashingPrime; ++ i)
 	{
 		int len = 0;
-		for (ptr = List[i]; ptr != NULL; ptr = ptr -> next)
+		for (ptr = List[i] -> next; ptr != NULL; ptr = ptr -> next)
 			++ len;
 		if (len > ret) ret = len;
 	}
 	return ret;
 }
 
+void ST_clear(struct SymbolsTable **List)
+{
+	int i;
+	for (i = 0; i < HashingPrime; ++ i)
+	{
+		List[i] = (struct SymbolsTable *)malloc(sizeof(struct SymbolsTable));	//	Just a Head Pointer
+		List[i] -> next = List[i] -> prev = NULL;
+	}
+}
+
+
+void Scope_clear(struct ScopeType *scope)
+{
+	scope -> top = 0;
+}
+
+int Scope_current(struct ScopeType *scope)
+{
+	return scope -> top;
+}
+
+void Scope_push(struct ScopeType *scope)
+{
+	scope -> Stack[scope -> top] = NULL;
+	++ scope -> top;
+}
+
+void Scope_pop(struct ScopeType *scope)
+{
+	if (scope -> top == 0)
+	{
+		fprintf(stderr, "Stack Error!\n");
+		return;
+	}
+	struct ScopeList	*ptr = scope -> Stack[scope -> top - 1];
+	while (ptr)
+	{
+		struct ScopeList	*next = ptr -> next;
+		ST_remove(ptr -> pearl);
+		free(ptr);
+		ptr = next;
+	}
+	-- scope -> top;
+}
+
+void Scope_insert(struct ScopeType *scope, struct SymbolsTable *pearl)
+{
+	if (scope -> top == 0)
+	{
+		fprintf(stderr, "Stack Error!\n");
+		return;
+	}
+	struct ScopeList	*ptr = (struct ScopeList *)malloc(sizeof(struct ScopeList));
+
+	ptr -> pearl = pearl;
+
+	ptr -> next = scope -> Stack[scope -> top - 1];
+	scope -> Stack[scope -> top - 1] = ptr;
+}
+
+
+void ScopeList_print(struct ScopeList *list)
+{
+	struct SymbolsTable		*entry;
+	for (; list; list = list -> next)
+	{
+		entry = list -> pearl;
+		printf("%s(%d): \n", entry -> name, entry -> scope);
+		Attribute_print(entry -> attr);
+	}
+}
+
+void Scope_print(struct ScopeType *scope)
+{
+	int i;
+	for (i = 0; i < scope -> top; ++ i)
+	{
+		printf("Scope %d: \n", i);
+		ScopeList_print(scope -> Stack[i]);
+	}
+}
+
+// NO
+int DST_check(struct DynamicStructureTable *dst, struct StructureType *attr, char *name)
+{
+	struct DynamicStructureTable *ptr;		// ptr --> useless
+	for (ptr = dst; ptr != NULL; ptr = ptr -> next)
+		if (strcmp(ptr -> name, name) == 0) return 0;
+	return 1;
+}
+
+// YES
+struct DynamicStructureTable *DST_insert(struct DynamicStructureTable *dst, char *name, struct StructureType *attr)
+{
+	struct DynamicStructureTable	*ptr = (struct DynamicStructureTable *)malloc(sizeof(struct DynamicStructureTable));
+	ptr -> next = dst;
+
+	strcpy(ptr -> name, name);
+	ptr -> attr = attr;
+	ptr -> scope = DST_Scope;
+
+	return ptr;
+}
+
+// YES
+void DST_remove(struct DynamicStructureTable **dst, int scope)
+{
+	struct DynamicStructureTable	**ptr;
+	for (ptr = dst; *ptr; )
+	{
+		struct DynamicStructureTable	*entry = *ptr;
+		if (entry -> scope == scope)
+		{
+			*ptr = entry -> next;
+			free(entry);
+		}
+		else
+			ptr = &entry -> next;
+	}
+}
+
+struct DynamicStructureTable *DST_find(struct DynamicStructureTable *dst, char *name)
+{
+	struct DynamicStructureTable *ptr;		// ptr --> useless
+	for (ptr = dst; ptr != NULL; ptr = ptr -> next)
+		if (strcmp(ptr -> name, name) == 0) return ptr;
+	return NULL;
+}
+
+void DST_Global(void)
+{
+	DST_Scope = GlobalScope;
+	DST_remove(&DST, LocalScope);
+}
+
+void DST_Local(void)
+{
+	DST_Scope = LocalScope;
+}
+
+
+void DST_clear(void)
+{
+	DST = NULL;	
+	DST_Global();
+}
+
+void DST_print(struct DynamicStructureTable *dst)
+{
+	struct DynamicStructureTable *ptr;
+	for (ptr = dst; ptr != NULL; ptr = ptr -> next)
+	{
+		printf("Name: %s, Scope: %d\n", ptr -> name, ptr -> scope);
+		Structure_print(ptr -> attr);
+		printf("\n");
+	}
+
+}
+
+
+
+/*
 
 int IntHashing(int key)
 {
@@ -68,61 +266,4 @@ int FloatHashing(float key)
 	return ((*((int *)&key)) % HashingPrime);
 }
 
-struct Constant Make_Constant(DataType type, int int_key, float float_key)
-{
-	struct Constant ret;
-	ret.type = type;
-	if (type == TYPE_INT)
-		ret.v_int = int_key;
-	else
-		ret.v_float = float_key;
-	return ret;
-}
-
-struct SymbolsTableNumber *STNUM_insert(struct SymbolsTableNumber **List, struct Constant num)
-{
-	struct SymbolsTableNumber *ptr;
-	if ((ptr = STNUM_find(List, num)) != NULL) return ptr;
-
-	ptr = (struct SymbolsTableNumber *)malloc(sizeof(struct SymbolsTableNumber));
-	ptr -> value = num;
-
-	int f = (num.type == TYPE_INT) ? IntHashing(num.v_int) : FloatHashing(num.v_float);
-	ptr -> next = List[f] -> next;
-	List[f] -> next = ptr;
-
-	return ptr;
-}
-
-
-struct SymbolsTableNumber *STNUM_find(struct SymbolsTableNumber **List, struct Constant num)
-{
-	struct SymbolsTableNumber	*ptr;
-	if (num.type == TYPE_INT)
-	{
-		int f = IntHashing(num.v_int);
-		for (ptr = List[f]; ptr != NULL; ptr = ptr -> next)
-			if (ptr -> value.v_int == num.v_int) return ptr;
-	}
-	else
-	{
-		int f = FloatHashing(num.v_float);
-		for (ptr = List[f]; ptr != NULL; ptr = ptr -> next)
-			if (ptr -> value.v_float == num.v_float) return ptr;
-	}
-	return NULL;
-}
-
-void SymbolsTableID_clear(struct SymbolsTableID **List)
-{
-	int i;
-	for (i = 0; i < HashingPrime; ++ i)
-		List[i] = NULL;
-}
-
-void SymbolsTableNumber_clear(struct SymbolsTableNumber **List)
-{
-	int i;
-	for (i = 0; i < HashingPrime; ++ i)
-		List[i] = NULL;
-}
+*/
