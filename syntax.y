@@ -226,7 +226,7 @@ VarDec				:	ID
 						}
 					|	VarDec LB INT RB
 						{
-							$$ = Build_VarDec((void *)Build_VarDec_B($1, Build_TYPE_INT($3)), &Visit_VarDec_B, &SemanticCheck_VarDec_B, &SemanticCheck_Structure_VarDec_B, &SemanticCheck_Parameter_VarDec_B, @$.first_line);
+							$$ = Build_VarDec((void *)Build_VarDec_B($1, Build_Exp_INT($3)), &Visit_VarDec_B, &SemanticCheck_VarDec_B, &SemanticCheck_Structure_VarDec_B, &SemanticCheck_Parameter_VarDec_B, @$.first_line);
 						}
 					|	VarDec LB error RB
 						{
@@ -285,27 +285,27 @@ StmtList			:	Stmt StmtList
 
 Stmt				:	Exp SEMI
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_Exp($1), &Visit_Stmt_Exp, @$.first_line);
+							$$ = Build_Stmt((void *)Build_Stmt_Exp($1), &Visit_Stmt_Exp, &SemanticCheck_Stmt_Exp, @$.first_line);
 						}
 					|	CompSt
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_CompSt($1), &Visit_Stmt_CompSt, @$.first_line);
+							$$ = Build_Stmt((void *)Build_Stmt_CompSt($1), &Visit_Stmt_CompSt, &SemanticCheck_Stmt_CompSt, @$.first_line);
 						}
 					|	RETURN Exp SEMI
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_Return($2), &Visit_Stmt_Return, @$.first_line);
+							$$ = Build_Stmt((void *)Build_Stmt_Return($2), &Visit_Stmt_Return,&SemanticCheck_Stmt_Return, @$.first_line);
 						}
 					|	IF LP Exp RP Stmt %prec LOWER_THAN_ELSE
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_If($3, $5), &Visit_Stmt_If, @$.first_line);
+							$$ = Build_Stmt((void *)Build_Stmt_If($3, $5), &Visit_Stmt_If, &SemanticCheck_Stmt_If, @$.first_line);
 						}
 					|	IF LP Exp RP Stmt ELSE Stmt
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_If_Else($3, $5, $7), &Visit_Stmt_If_Else, @$.first_line);
+							$$ = Build_Stmt((void *)Build_Stmt_If_Else($3, $5, $7), &Visit_Stmt_If_Else, &SemanticCheck_Stmt_If_Else, @$.first_line);
 						}
 					|	WHILE LP Exp RP Stmt
 						{
-							$$ = Build_Stmt((void *)Build_Stmt_While($3, $5), &Visit_Stmt_While, @$.first_line);
+							$$ = Build_Stmt((void *)Build_Stmt_While($3, $5), &Visit_Stmt_While, &SemanticCheck_Stmt_While, @$.first_line);
 						}
 					|	RETURN error SEMI
 						{
@@ -395,75 +395,75 @@ Dec					:	VarDec
 
 Exp					:	Exp ASSIGNOP Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Assign($1, $3), &Visit_Exp_Assign, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Assign($1, $3), 0, &Visit_Exp_Assign, &SemanticCheck_Exp_Assign, @$.first_line);
 						}
 					|	Exp AND Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_AND), &Visit_Exp_Binary_Cal, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_AND), 0, &Visit_Exp_Binary_Cal, &SemanticCheck_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp OR Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_OR), &Visit_Exp_Binary_Cal, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_OR), 0, &Visit_Exp_Binary_Cal, &SemanticCheck_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp RELOP Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Rel($1, $3, $2), &Visit_Exp_Binary_Rel, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Rel($1, $3, $2), 0, &Visit_Exp_Binary_Rel, &SemanticCheck_Exp_Binary_Rel, @$.first_line);
 						}
 					|	Exp PLUS Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_PLUS), &Visit_Exp_Binary_Cal, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_PLUS), 0, &Visit_Exp_Binary_Cal, &SemanticCheck_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp MINUS Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_MINUS), &Visit_Exp_Binary_Cal, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_MINUS), 0, &Visit_Exp_Binary_Cal, &SemanticCheck_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp STAR Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_STAR), &Visit_Exp_Binary_Cal, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_STAR), 0, &Visit_Exp_Binary_Cal, &SemanticCheck_Exp_Binary_Cal, @$.first_line);
 						}
 					|	Exp DIV Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_DIV), &Visit_Exp_Binary_Cal, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Binary_Cal($1, $3, OP_DIV), 0, &Visit_Exp_Binary_Cal, &SemanticCheck_Exp_Binary_Cal, @$.first_line);
 						}
 					|	LP Exp RP
 						{
-							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_PAR), &Visit_Exp_Unary, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_PAR), 0, &Visit_Exp_Unary, &SemanticCheck_Exp_Unary, @$.first_line);
 						}
 					|	MINUS Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_NEG), &Visit_Exp_Unary, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_NEG), 0, &Visit_Exp_Unary, &SemanticCheck_Exp_Unary, @$.first_line);
 						}
 					|	NOT Exp
 						{
-							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_NOT), &Visit_Exp_Unary, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_NOT), 0, &Visit_Exp_Unary, &SemanticCheck_Exp_Unary, @$.first_line);
 						}
 					|	ID LP Args RP
 						{
-							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), $3), &Visit_Exp_Function, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), $3), 0, &Visit_Exp_Function, &SemanticCheck_Exp_Function, @$.first_line);
 						}
 					|	ID LP RP
 						{
-							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), NULL), &Visit_Exp_Function, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), NULL), 0, &Visit_Exp_Function, &SemanticCheck_Exp_Function, @$.first_line);
 						}
 					|	Exp LB Exp RB
 						{
-							$$ = Build_Exp((void *)Build_Exp_Array($1, $3), &Visit_Exp_Array, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Array($1, $3), 1, &Visit_Exp_Array, &SemanticCheck_Exp_Array, @$.first_line);
 						}
 					|	Exp DOT ID
 						{
-							$$ = Build_Exp((void *)Build_Exp_Attribute($1, Build_ID($3)), &Visit_Exp_Attribute, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Attribute($1, Build_ID($3)), 1, &Visit_Exp_Attribute, &SemanticCheck_Exp_Attribute, @$.first_line);
 						}
 					|	ID
 						{
-							$$ = Build_Exp((void *)Build_ID($1), &Visit_ID, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Variable(Build_ID($1)), 1, &Visit_Exp_Variable, &SemanticCheck_Exp_Variable, @$.first_line);
 						}
 					|	INT
 						{
-							$$ = Build_Exp((void *)Build_TYPE_INT($1), &Visit_TYPE_INT, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_INT($1), 0, &Visit_Exp_INT, &SemanticCheck_Exp_INT, @$.first_line);
 						}
 					|	FLOAT
 						{
-							$$ = Build_Exp((void *)Build_TYPE_FLOAT($1), &Visit_TYPE_FLOAT, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_FLOAT($1), 0, &Visit_Exp_FLOAT, &SemanticCheck_Exp_FLOAT, @$.first_line);
 						}
 					|	LP error RP
 						{

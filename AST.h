@@ -139,7 +139,7 @@ struct VarDec_A {
 
 struct VarDec_B {
 	struct VarDec		*vardec;
-	struct TYPE_INT		*type_int;
+	struct Exp_INT		*exp_int;
 };
 
 
@@ -254,11 +254,13 @@ struct Dec {
 struct Exp {
 	struct TreeNode		tree;
 
+	int		left_value;
+
 	void	*next;
 
 	void	(*Visit)(void *);
 
-	void	(*SemanticCheck)(void *);
+	struct TYPE		*(*SemanticCheck)(void *);
 };
 
 
@@ -300,11 +302,11 @@ struct Exp_Variable {
 	struct ID		*var;
 };
 
-struct TYPE_INT {
+struct Exp_INT {
 	int		key;
 };
 
-struct TYPE_FLOAT {
+struct Exp_FLOAT {
 	float	key;
 };
 
@@ -341,13 +343,13 @@ struct OptTag				*Build_OptTag(struct ID *, int);
 struct Tag					*Build_Tag(struct ID *, int);
 struct VarDec				*Build_VarDec(void *, void (*)(void *), struct SymbolsTable *(*)(void *, struct TYPE *), struct StructureType *(*)(void *, struct TYPE *), struct Parameter *(*)(void *, struct TYPE *), int);
 struct VarDec_A				*Build_VarDec_A(struct ID *);
-struct VarDec_B				*Build_VarDec_B(struct VarDec *, struct TYPE_INT *);
+struct VarDec_B				*Build_VarDec_B(struct VarDec *, struct Exp_INT *);
 struct FunDec				*Build_FunDec(struct ID *, struct VarList *, int);
 struct VarList				*Build_VarList(struct ParamDec *, struct VarList *, int);
 struct ParamDec				*Build_ParamDec(struct Specifier *, struct VarDec *, int);
 struct CompSt				*Build_CompSt(struct DefList *, struct StmtList *, int);
 struct StmtList				*Build_StmtList(struct Stmt *, struct StmtList *, int);
-struct Stmt					*Build_Stmt(void *, void (*)(void *), int);
+struct Stmt					*Build_Stmt(void *, void (*)(void *), void (*)(void *, struct TYPE *), int);
 struct Stmt_Exp				*Build_Stmt_Exp(struct Exp *);
 struct Stmt_CompSt			*Build_Stmt_CompSt(struct CompSt *);
 struct Stmt_Return			*Build_Stmt_Return(struct Exp *);
@@ -358,7 +360,7 @@ struct DefList				*Build_DefList(struct Def *, struct DefList *, int);
 struct Def					*Build_Def(struct Specifier *, struct DecList *, int);
 struct DecList				*Build_DecList(struct Dec *, struct DecList *, int);
 struct Dec					*Build_Dec(struct VarDec *, struct Exp *, int);
-struct Exp					*Build_Exp(void *, void (*)(void *), int);
+struct Exp					*Build_Exp(void *, int, void (*)(void *),struct TYPE *(*)(void *), int);
 struct Exp_Assign			*Build_Exp_Assign(struct Exp *, struct Exp *);
 struct Exp_Binary_Rel		*Build_Exp_Binary_Rel(struct Exp *, struct Exp *, BinaryOP_Relop);
 struct Exp_Binary_Cal		*Build_Exp_Binary_Cal(struct Exp *, struct Exp *, BinaryOP_Calop);
@@ -367,8 +369,8 @@ struct Exp_Function			*Build_Exp_Function(struct ID *, struct Args *);
 struct Exp_Array			*Build_Exp_Array(struct Exp *, struct Exp *);
 struct Exp_Attribute		*Build_Exp_Attribute(struct Exp *, struct ID *);
 struct Exp_Variable			*Build_Exp_Variable(struct ID *);
-struct TYPE_INT				*Build_TYPE_INT(int);
-struct TYPE_FLOAT			*Build_TYPE_FLOAT(float);
+struct Exp_INT				*Build_Exp_INT(int);
+struct Exp_FLOAT			*Build_Exp_FLOAT(float);
 struct Args					*Build_Args(struct Exp *, struct Args *, int);
 struct ID					*Build_ID(char *);
 
@@ -416,8 +418,8 @@ void Visit_Exp_Function(void *);
 void Visit_Exp_Array(void *);
 void Visit_Exp_Attribute(void *);
 void Visit_Exp_Variable(void *);
-void Visit_TYPE_INT(void *);
-void Visit_TYPE_FLOAT(void *);
+void Visit_Exp_INT(void *);
+void Visit_Exp_FLOAT(void *);
 void Visit_Args(struct Args *);
 void Visit_ID(void *);
 void Visit_DataType(DataType);

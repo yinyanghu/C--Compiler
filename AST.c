@@ -210,12 +210,12 @@ struct VarDec_A *Build_VarDec_A(struct ID *child)
 	return ptr;
 }
 
-struct VarDec_B *Build_VarDec_B(struct VarDec *child_A, struct TYPE_INT *child_B)
+struct VarDec_B *Build_VarDec_B(struct VarDec *child_A, struct Exp_INT *child_B)
 {
 	struct VarDec_B		*ptr = (struct VarDec_B *)malloc(sizeof(struct VarDec_B));
 
 	ptr -> vardec = child_A;
-	ptr -> type_int = child_B;
+	ptr -> exp_int = child_B;
 
 	return ptr;
 }
@@ -275,13 +275,15 @@ struct StmtList *Build_StmtList(struct Stmt *child_A, struct StmtList *child_B, 
 	return ptr;
 }
 
-struct Stmt *Build_Stmt(void *child, void (*func_visit)(void *), int lineno)
+struct Stmt *Build_Stmt(void *child, void (*func_visit)(void *), void (*func_sc)(void *, struct TYPE *), int lineno)
 {
 	struct Stmt		*ptr = (struct Stmt *)malloc(sizeof(struct Stmt));
 
 	TreeNode_SetLineno(&(ptr -> tree), lineno);
 	ptr -> next = child;
+
 	ptr -> Visit = func_visit;
+	ptr -> SemanticCheck = func_sc;
 
 	return ptr;
 }
@@ -391,14 +393,18 @@ struct Dec *Build_Dec(struct VarDec *child_A, struct Exp *child_B, int lineno)
 	return ptr;
 }
 
-struct Exp *Build_Exp(void *child, void (*func_visit)(void *), int lineno)
+struct Exp *Build_Exp(void *child, int LV, void (*func_visit)(void *), struct TYPE *(*func_sc)(void *), int lineno)
 {
 	struct Exp		*ptr = (struct Exp *)malloc(sizeof(struct Exp));
 
 	TreeNode_SetLineno(&(ptr -> tree), lineno);
 
 	ptr -> next = child;
+
+	ptr -> left_value = LV;
+
 	ptr -> Visit = func_visit;
+	ptr -> SemanticCheck = func_sc;
 
 	return ptr;
 }
@@ -484,18 +490,18 @@ struct Exp_Variable *Build_Exp_Variable(struct ID *child)
 	return ptr;
 }
 
-struct TYPE_INT *Build_TYPE_INT(int child)
+struct Exp_INT *Build_Exp_INT(int child)
 {
-	struct TYPE_INT		*ptr = (struct TYPE_INT *)malloc(sizeof(struct TYPE_INT));
+	struct Exp_INT		*ptr = (struct Exp_INT *)malloc(sizeof(struct Exp_INT));
 
 	ptr -> key = child;
 
 	return ptr;
 }
 
-struct TYPE_FLOAT *Build_TYPE_FLOAT(float child)
+struct Exp_FLOAT *Build_Exp_FLOAT(float child)
 {
-	struct TYPE_FLOAT	*ptr = (struct TYPE_FLOAT *)malloc(sizeof(struct TYPE_FLOAT));
+	struct Exp_FLOAT	*ptr = (struct Exp_FLOAT *)malloc(sizeof(struct Exp_FLOAT));
 
 	ptr -> key = child;
 
@@ -734,7 +740,7 @@ void Visit_VarDec_B(void *v)
 
 	IPrint("LB");
 
-	Visit_TYPE_INT(ptr -> type_int);
+	Visit_Exp_INT(ptr -> exp_int);
 
 	IPrint("RB");
 }
@@ -1082,20 +1088,20 @@ void Visit_Exp_Variable(void *v)
 	Visit_ID(ptr -> var);
 }
 
-void Visit_TYPE_INT(void *v)
+void Visit_Exp_INT(void *v)
 {
 	if (v == NULL) return;
-	struct TYPE_INT		*ptr = (struct TYPE_INT *)v;
+	struct Exp_INT		*ptr = (struct Exp_INT *)v;
 
 	++ indent;
 	PRINT(indent << 1, "INT: "); printf("%d", ptr -> key); ENDL;
 	-- indent;
 }
 
-void Visit_TYPE_FLOAT(void *v)
+void Visit_Exp_FLOAT(void *v)
 {
 	if (v == NULL) return;
-	struct TYPE_FLOAT	*ptr = (struct TYPE_FLOAT *)v;
+	struct Exp_FLOAT	*ptr = (struct Exp_FLOAT *)v;
 
 	++ indent;
 	PRINT(indent << 1, "FLOAT: "); printf("%.6f", ptr -> key); ENDL;

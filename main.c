@@ -16,7 +16,6 @@ int main(int argc, char **argv)
 {
 	/*yydebug = 1;*/
 
-	/*
 	if (argc != 2)
 	{
 		fprintf(stderr, "cmm: fatal error: No input files or Not only one input files\n");
@@ -31,8 +30,7 @@ int main(int argc, char **argv)
 	}
 
 	FILE *f = fopen(argv[1], "r");
-	*/
-	FILE *f = fopen("elixir.c", "r");
+	//FILE *f = fopen("elixir.c", "r");
 	if (!f)
 	{
 		fprintf(stderr, "cmm: fatal error: %s: No such file or directory\n", argv[1]); 
@@ -47,7 +45,7 @@ int main(int argc, char **argv)
 
 	if (ErrorCounter == 0)
 	{
-		Visit_Program(AST);
+	//	Visit_Program(AST);
 		SemanticAnalysis(AST);
 	}
 

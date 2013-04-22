@@ -12,6 +12,24 @@ A simplified C Compiler
 
 ## Timeline
 
+* April 22, 2013:
+
+> Semantic Analyser: Debug, Error Reporting, Test
+
+> Lab2 ==> Almost Completed~
+
+* April 21, 2013:
+
+> Semantic Analyser: Semantic Check on Expression
+
+* April 20, 2013:
+
+> Semantic Analyser: Semantic Check on Structure
+
+* April 19, 2013:
+
+> Semantic Analyser: Symbols Table, Basic Framework
+
 * April 18, 2013:
 
 > Semantic Analyser: Symbols Table, Basic Framework

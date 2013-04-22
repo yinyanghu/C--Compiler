@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -I. -Werror -g
+CFLAGS = -I. -g -Werror
 
 FLEXLIB = -lfl
 BISONLIB = -lfl -ly

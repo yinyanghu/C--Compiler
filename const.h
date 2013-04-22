@@ -11,6 +11,7 @@
 //#define GLOBAL_COLOR
 
 typedef enum {
+	Accept,						// 0
 	VarUndefined,				// 1
 	FuncUndefined,				// 2
 	VarMultiDefined,			// 3

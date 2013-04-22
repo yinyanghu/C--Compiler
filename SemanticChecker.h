@@ -140,9 +140,10 @@ struct Parameter		*SemanticCheck_VarList(struct VarList *);
 struct Parameter		*SemanticCheck_ParamDec(struct ParamDec *);
 
 
+void SemanticCheck_CompSt(struct CompSt *, struct TYPE *);
 void SemanticCheck_StmtList(struct StmtList *, struct TYPE *);
 void SemanticCheck_Stmt(struct Stmt *, struct TYPE *);
-
+void SemanticCheck_Stmt_Exp(void *, struct TYPE *);
 void SemanticCheck_Stmt_Return(void *, struct TYPE *);
 void SemanticCheck_Stmt_CompSt(void *, struct TYPE *);
 void SemanticCheck_Stmt_If(void *, struct TYPE *);
@@ -150,15 +151,21 @@ void SemanticCheck_Stmt_If_Else(void *, struct TYPE *);
 void SemanticCheck_Stmt_While(void *, struct TYPE *);
 
 
+struct TYPE		*SemanticCheck_Exp(struct Exp *);
+struct TYPE		*SemanticCheck_Exp_Assign(void *);
+struct TYPE		*SemanticCheck_Exp_Binary_Rel(void *);
+struct TYPE		*SemanticCheck_Exp_Binary_Cal(void *);
+struct TYPE		*SemanticCheck_Exp_Unary(void *);
+struct TYPE		*SemanticCheck_Exp_Function(void *);
+struct TYPE		*SemanticCheck_Exp_Array(void *);
+struct TYPE		*SemanticCheck_Exp_Attribute(void *);
+struct TYPE		*SemanticCheck_Exp_INT(void *);
+struct TYPE		*SemanticCheck_Exp_FLOAT(void *);
+struct TYPE		*SemanticCheck_Exp_Variable(void *);
 
-void SemanticCheck_CompSt(struct CompSt *, struct TYPE *);
-
-
-void SemanticCheck_Exp(struct Exp *);
-void SemanticCheck_Args(struct Args *);
-
-void Checking_Return(struct TYPE *, struct Exp *);
-void Checking_Condition(struct Exp *);
+int		Checking_Parameter(struct Args *, struct Parameter *);
+void	Checking_Condition(struct Exp *);
+int		Checking_MatchingType(struct TYPE *, struct TYPE *);
 
 
 #endif
