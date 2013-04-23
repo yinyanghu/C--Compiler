@@ -54,6 +54,12 @@ struct DynamicStructureTable {
 	struct DynamicStructureTable *next;
 };
 
+struct DeclaredFunctionList {
+	int lineno;
+	char name[NameSize];
+	struct DeclaredFunctionList	*next;
+};
+
 /*
 int IntHashing(int);
 
@@ -61,6 +67,17 @@ int FloatHashing(float);
 
 struct Constant Make_Constant(DataType, int, float);
 */
+
+void DFL_clear(void);
+
+struct DeclaredFunctionList *DFL_insert(struct DeclaredFunctionList *, char *, int);
+
+void DFL_remove(struct DeclaredFunctionList **, char *);
+
+int DFL_check(struct DeclaredFunctionList *);
+
+
+
 
 int StringHashing(char *);
 
@@ -76,13 +93,14 @@ void ST_clear(struct SymbolsTable **);
 
 int ST_Test(struct SymbolsTable **);
 
-int DST_check(struct DynamicStructureTable *, struct StructureType *, char *);
 
 struct DynamicStructureTable *DST_insert(struct DynamicStructureTable *, char *, struct StructureType *);
 
 void DST_remove(struct DynamicStructureTable **, int);
 
 struct DynamicStructureTable *DST_find(struct DynamicStructureTable *, char *);
+
+int DST_check(struct DynamicStructureTable *, struct StructureType *, char *);
 
 void DST_print(struct DynamicStructureTable *);
 
@@ -111,5 +129,7 @@ extern struct ScopeType			StructScope;
 
 extern struct DynamicStructureTable		*DST;
 extern int	DST_Scope;
+
+extern struct DeclaredFunctionList		*DFL;
 
 #endif

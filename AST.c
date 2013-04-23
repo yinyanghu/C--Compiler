@@ -84,6 +84,16 @@ struct ExtDef_C *Build_ExtDef_C(struct Specifier *child_A, struct FunDec *child_
 	return ptr;
 }
 
+struct ExtDef_D *Build_ExtDef_D(struct Specifier *child_A, struct FunDec *child_B)
+{
+	struct ExtDef_D		*ptr = (struct ExtDef_D *)malloc(sizeof(struct ExtDef_D));
+
+	ptr -> specifier = child_A;
+	ptr -> fundec = child_B;
+
+	return ptr;
+}
+
 struct ExtDecList *Build_ExtDecList(struct VarDec *child_A, struct ExtDecList *child_B, int lineno)
 {
 	struct ExtDecList	*ptr = (struct ExtDecList *)malloc(sizeof(struct ExtDecList));
@@ -185,7 +195,7 @@ struct Tag *Build_Tag(struct ID *child, int lineno)
 }
 
 
-struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct SymbolsTable *(*func_sc)(void *, struct TYPE *), struct StructureType *(*func_ssc)(void *, struct TYPE *), struct Parameter *(*func_spc)(void *, struct TYPE *), int lineno)
+struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct SymbolsTable *(*func_sc)(void *, struct TYPE *), struct StructureType *(*func_ssc)(void *, struct TYPE *), struct Argument *(*func_spc)(void *, struct TYPE *), int lineno)
 {
 	struct VarDec	*ptr = (struct VarDec *)malloc(sizeof(struct VarDec));
 
@@ -195,7 +205,7 @@ struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct Symb
 	ptr -> Visit = func_visit;
 	ptr -> SemanticCheck = func_sc;
 	ptr -> SemanticStructCheck = func_ssc;
-	ptr -> SemanticParameterCheck = func_spc;
+	ptr -> SemanticArgumentCheck = func_spc;
 
 	return ptr;
 }
@@ -601,6 +611,15 @@ void Visit_ExtDef_C(void *v)
 	Visit_Specifier(ptr -> specifier);
 	Visit_FunDec(ptr -> fundec);
 	Visit_CompSt(ptr -> compst);
+}
+
+void Visit_ExtDef_D(void *v)
+{
+	if (v == NULL) return;
+	struct ExtDef_D		*ptr = (struct ExtDef_D *)v;
+
+	Visit_Specifier(ptr -> specifier);
+	Visit_FunDec(ptr -> fundec);
 }
 
 void Visit_ExtDecList(struct ExtDecList *v)

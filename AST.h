@@ -59,6 +59,11 @@ struct ExtDef_C {
 	struct CompSt		*compst;
 };
 
+struct ExtDef_D {
+	struct Specifier	*specifier;
+	struct FunDec		*fundec;
+};
+
 struct ExtDecList {
 	struct TreeNode		tree;
 
@@ -129,7 +134,7 @@ struct VarDec {
 
 	struct StructureType	*(*SemanticStructCheck)(void *, struct TYPE *);
 
-	struct Parameter		*(*SemanticParameterCheck)(void *, struct TYPE *);
+	struct Argument			*(*SemanticArgumentCheck)(void *, struct TYPE *);
 };
 
 struct VarDec_A {
@@ -332,6 +337,7 @@ struct ExtDef				*Build_ExtDef(void *, void (*)(void *), void (*)(void *), int);
 struct ExtDef_A				*Build_ExtDef_A(struct Specifier *, struct ExtDecList *);
 struct ExtDef_B				*Build_ExtDef_B(struct Specifier *);
 struct ExtDef_C				*Build_ExtDef_C(struct Specifier *, struct FunDec *, struct CompSt *);
+struct ExtDef_D				*Build_ExtDef_D(struct Specifier *, struct FunDec *);
 struct ExtDecList			*Build_ExtDecList(struct VarDec *, struct ExtDecList *, int);
 struct Specifier			*Build_Specifier(void *, void (*)(void *), struct TYPE *(*)(void *), int);
 struct Specifier_A			*Build_Specifier_A(DataType);
@@ -341,7 +347,7 @@ struct StructSpecifier_A	*Build_StructSpecifier_A(struct OptTag *, struct DefLis
 struct StructSpecifier_B	*Build_StructSpecifier_B(struct Tag *);
 struct OptTag				*Build_OptTag(struct ID *, int);
 struct Tag					*Build_Tag(struct ID *, int);
-struct VarDec				*Build_VarDec(void *, void (*)(void *), struct SymbolsTable *(*)(void *, struct TYPE *), struct StructureType *(*)(void *, struct TYPE *), struct Parameter *(*)(void *, struct TYPE *), int);
+struct VarDec				*Build_VarDec(void *, void (*)(void *), struct SymbolsTable *(*)(void *, struct TYPE *), struct StructureType *(*)(void *, struct TYPE *), struct Argument *(*)(void *, struct TYPE *), int);
 struct VarDec_A				*Build_VarDec_A(struct ID *);
 struct VarDec_B				*Build_VarDec_B(struct VarDec *, struct Exp_INT *);
 struct FunDec				*Build_FunDec(struct ID *, struct VarList *, int);
@@ -381,6 +387,7 @@ void Visit_ExtDef(struct ExtDef *);
 void Visit_ExtDef_A(void *);
 void Visit_ExtDef_B(void *);
 void Visit_ExtDef_C(void *);
+void Visit_ExtDef_D(void *);
 void Visit_ExtDecList(struct ExtDecList *);
 void Visit_Specifier(struct Specifier *);
 void Visit_Specifier_A(void *);

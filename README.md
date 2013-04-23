@@ -12,6 +12,12 @@ A simplified C Compiler
 
 ## Timeline
 
+* April 23, 2013:
+
+> Semantic Analyser: Debug, Error Reporting, Test(Con't)
+
+> Grammar: Add Function Declaration Statment
+
 * April 22, 2013:
 
 > Semantic Analyser: Debug, Error Reporting, Test

@@ -20,7 +20,7 @@ typedef enum {
 	LeftValueError,				// 6
 	OpTypeMismatch,				// 7
 	ReturnMismatch,				// 8
-	FuncParameterMismatch,		// 9
+	FuncArgumentMismatch,		// 9
 	ArrayOpError,				// 10
 	FuncCallOpError,			// 11
 	ArrayAccessError,			// 12
@@ -30,7 +30,8 @@ typedef enum {
 	StructMultiDefined,			// 16
 	StructUndefined,			// 17
 	FuncDeclareButUndefined,	// 18
-	FuncDefineConflict			// 19
+	FuncDefineConflict,			// 19
+	UnexpectedError				// 20
 } SemanticErrorType;
 
 typedef enum {

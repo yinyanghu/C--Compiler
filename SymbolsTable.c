@@ -14,6 +14,46 @@ struct ScopeType			StructScope;
 struct DynamicStructureTable	*DST;
 int		DST_Scope;
 
+struct DeclaredFunctionList		*DFL;
+
+
+void DFL_clear(void)
+{
+	DFL = NULL;
+}
+
+struct DeclaredFunctionList *DFL_insert(struct DeclaredFunctionList *dfl, char *name, int lineno)
+{
+	struct DeclaredFunctionList		*ptr = (struct DeclaredFunctionList *)malloc(sizeof(struct DeclaredFunctionList));
+
+	ptr -> next = dfl;
+	ptr -> lineno = lineno;
+	strcpy(ptr -> name, name);
+
+	return ptr;
+}
+
+void DFL_remove(struct DeclaredFunctionList **dfl, char *name)
+{
+	struct DeclaredFunctionList		**ptr;
+	for (ptr = dfl; *ptr; )
+	{
+		struct DeclaredFunctionList		*entry = *ptr;
+		if (strcmp(entry -> name, name) == 0)
+		{
+			*ptr = entry -> next;
+			free(entry);
+		}
+		else
+			ptr = &entry -> next;
+	}
+}
+
+int DFL_check(struct DeclaredFunctionList *dfl)
+{
+	return (dfl == NULL ? 1 : 0);
+}
+
 
 // BKDR Hash Function
 int StringHashing(char *str)

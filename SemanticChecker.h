@@ -11,18 +11,10 @@ struct ArrayType {
 };
 
 struct StructureType {
-	char	name[NameSize];
-	struct TYPE		*type;
+	char					name[NameSize];
+	struct TYPE				*type;
 	struct StructureType	*next;
 };
-
-/*
-if (Check_Structure_MultiDefined())
-{
-
-}
-struct StructureType	*ptr = (struct StructureType *)malloc(sizeof(struct StructureType));
-*/
 
 struct TYPE {
 	enum {
@@ -30,23 +22,29 @@ struct TYPE {
 	} level;
 
 	union {
-		DataType	basic;
-		struct ArrayType	*array;
+		DataType				basic;
+		struct ArrayType		*array;
 		struct StructureType	*structure;
 	};
 };
 
-struct Parameter {
+struct Argument {
 	struct TYPE			*type;
 	char				name[NameSize];
-	struct Parameter	*next;
+	struct Argument		*next;
 };
+
+typedef enum {
+	Declared,
+	Defined
+} FuncStatus;
 
 struct FunctionAttribute {
 	struct TYPE			*return_type;		
-	struct Parameter	*args;
+	struct Argument		*args;
 	unsigned int		address;
 	int					size;
+	FuncStatus			status;
 };
 
 
@@ -54,11 +52,11 @@ struct VariableAttribute {
 	struct TYPE		*type;
 	union
 	{
-		int v_int;
-		float v_float;
+		int			v_int;
+		float		v_float;
 	};
-	unsigned int address;
-	int size;
+	unsigned int	address;
+	int				size;
 };
 
 typedef enum {
@@ -67,7 +65,7 @@ typedef enum {
 } AttributeType;
 
 struct Attribute {
-	AttributeType type;
+	AttributeType					type;
 	union {
 		struct FunctionAttribute	*func;
 		struct VariableAttribute	*var;
@@ -76,22 +74,25 @@ struct Attribute {
 
 #include "AST.h"
 
+void SemanticChecker(int, int);
+void SemanticAnalysis(struct Program *);
 
 void Structure_print(struct StructureType *);
 void TYPE_print(struct TYPE *);
 void Array_print(struct ArrayType *);
 void Attribute_print(struct Attribute *);
+void Function_print(struct FunctionAttribute *);
+void Argument_print(struct Argument *);
 
+void						Build_TYPE_Basic(void);
+struct Argument				*Build_Argument(char *, struct TYPE *, struct Argument *);
 struct ArrayType			*Build_Array(struct TYPE *, int);
 struct VariableAttribute	*Build_VariableAttribute(struct TYPE *, int, float, unsigned int, int);
 struct StructureType		*Build_Structure(char *, struct TYPE *, struct StructureType *);
-struct FunctionAttribute	*Build_FunctionAttribute(struct TYPE *, struct Parameter *, unsigned int, int);
+struct FunctionAttribute	*Build_FunctionAttribute(struct TYPE *, struct Argument *, unsigned int, int, FuncStatus);
 struct Attribute			*Build_Attribute(AttributeType, struct FunctionAttribute *, struct VariableAttribute *);
 
 void Remove_Structure(struct StructureType *);
-
-void SemanticChecker(int, int, char *);
-void SemanticAnalysis(struct Program *);
 
 char *SemanticCheck_OptTag(struct OptTag *);
 char *SemanticCheck_Tag(struct Tag *);
@@ -102,6 +103,7 @@ void SemanticCheck_ExtDef(struct ExtDef *);
 void SemanticCheck_ExtDef_A(void *);
 void SemanticCheck_ExtDef_B(void *);
 void SemanticCheck_ExtDef_C(void *);
+void SemanticCheck_ExtDef_D(void *);
 void SemanticCheck_ExtDecList(struct ExtDecList *, struct TYPE *type);
 
 struct TYPE				*SemanticCheck_Specifier(struct Specifier *);
@@ -120,9 +122,9 @@ struct StructureType	*SemanticCheck_Structure_VarDec(struct VarDec *, struct TYP
 struct StructureType	*SemanticCheck_Structure_VarDec_A(void *, struct TYPE *);
 struct StructureType	*SemanticCheck_Structure_VarDec_B(void *, struct TYPE *);
 
-struct Parameter		*SemanticCheck_Parameter_VarDec(struct VarDec *, struct TYPE *);
-struct Parameter		*SemanticCheck_Parameter_VarDec_A(void *, struct TYPE *);
-struct Parameter		*SemanticCheck_Parameter_VarDec_B(void *, struct TYPE *);
+struct Argument			*SemanticCheck_Argument_VarDec(struct VarDec *, struct TYPE *);
+struct Argument			*SemanticCheck_Argument_VarDec_A(void *, struct TYPE *);
+struct Argument			*SemanticCheck_Argument_VarDec_B(void *, struct TYPE *);
 
 struct StructureType	*SemanticCheck_Structure_DefList(struct DefList *);
 struct StructureType	*SemanticCheck_Structure_Def(struct Def *);
@@ -135,9 +137,9 @@ void					SemanticCheck_DecList(struct DecList *, struct TYPE *);
 void					SemanticCheck_Dec(struct Dec *, struct TYPE *);
 
 
-void					SemanticCheck_FunDec(struct FunDec *, struct TYPE *);
-struct Parameter		*SemanticCheck_VarList(struct VarList *);
-struct Parameter		*SemanticCheck_ParamDec(struct ParamDec *);
+void					SemanticCheck_FunDec(struct FunDec *, struct TYPE *, FuncStatus);
+struct Argument			*SemanticCheck_VarList(struct VarList *);
+struct Argument			*SemanticCheck_ParamDec(struct ParamDec *);
 
 
 void SemanticCheck_CompSt(struct CompSt *, struct TYPE *);
@@ -163,9 +165,12 @@ struct TYPE		*SemanticCheck_Exp_INT(void *);
 struct TYPE		*SemanticCheck_Exp_FLOAT(void *);
 struct TYPE		*SemanticCheck_Exp_Variable(void *);
 
-int		Checking_Parameter(struct Args *, struct Parameter *);
+void	Checking_DFL(void);
+int		Checking_Argument_Args(struct Args *, struct Argument *);
+int		Checking_Argument(struct Argument *, struct Argument *);
 void	Checking_Condition(struct Exp *);
 int		Checking_MatchingType(struct TYPE *, struct TYPE *);
+int		Checking_Function(struct FunctionAttribute *, struct FunctionAttribute *);
 
 
 #endif

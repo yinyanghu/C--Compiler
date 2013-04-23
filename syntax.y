@@ -137,6 +137,10 @@ ExtDef				:	Specifier ExtDecList SEMI
 						{
 							$$ = Build_ExtDef((void *)Build_ExtDef_C($1, $2, $3), &Visit_ExtDef_C, &SemanticCheck_ExtDef_C, @$.first_line);
 						}
+					|	Specifier FunDec SEMI
+						{
+							$$ = Build_ExtDef((void *)Build_ExtDef_D($1, $2), &Visit_ExtDef_D, &SemanticCheck_ExtDef_D, @$.first_line);
+						}
 					|	error SEMI
 						{
 							SyntaxErrorReport(yylineno, "Invaild defination before ';' token");
@@ -222,11 +226,11 @@ Tag					:	ID
 
 VarDec				:	ID
 						{
-							$$ = Build_VarDec((void *)Build_VarDec_A(Build_ID($1)), &Visit_VarDec_A, &SemanticCheck_VarDec_A, &SemanticCheck_Structure_VarDec_A, &SemanticCheck_Parameter_VarDec_A, @$.first_line);
+							$$ = Build_VarDec((void *)Build_VarDec_A(Build_ID($1)), &Visit_VarDec_A, &SemanticCheck_VarDec_A, &SemanticCheck_Structure_VarDec_A, &SemanticCheck_Argument_VarDec_A, @$.first_line);
 						}
 					|	VarDec LB INT RB
 						{
-							$$ = Build_VarDec((void *)Build_VarDec_B($1, Build_Exp_INT($3)), &Visit_VarDec_B, &SemanticCheck_VarDec_B, &SemanticCheck_Structure_VarDec_B, &SemanticCheck_Parameter_VarDec_B, @$.first_line);
+							$$ = Build_VarDec((void *)Build_VarDec_B($1, Build_Exp_INT($3)), &Visit_VarDec_B, &SemanticCheck_VarDec_B, &SemanticCheck_Structure_VarDec_B, &SemanticCheck_Argument_VarDec_B, @$.first_line);
 						}
 					|	VarDec LB error RB
 						{
