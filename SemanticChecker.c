@@ -17,8 +17,8 @@ const char		*ErrorMessage[] =
 	"Redefined function", // 4
 	"Incompatible types when assigning", // 5
 	"L-value required as left operand of assignment", // 6
-	"Operands type mismatched", // 7
-	"Return type mismatched", //8
+	"Incompatible operands type", // 7
+	"Incompatible return type", //8
 	"Invalid arguments", // 9 <--------------
 	"Invalid array", // 10
 	"Invalid function", // 11
@@ -134,12 +134,13 @@ struct Attribute	*Build_Attribute(AttributeType attr_type, struct FunctionAttrib
 void Structure_print(struct StructureType *ptr)
 {
 	fprintf(stderr, "{ ");
-	for (;ptr; ptr = ptr -> next)
+	for (; ptr != NULL; ptr = ptr -> next)
 	{
 		TYPE_print(ptr -> type);
-		fprintf(stderr, " %s, ", ptr -> name);
+		if (ptr -> next != NULL)
+			fprintf(stderr, ", ");
 	}
-	fprintf(stderr, "}");
+	fprintf(stderr, " }");
 }
 
 void TYPE_print(struct TYPE *ptr)
@@ -168,22 +169,24 @@ void TYPE_print(struct TYPE *ptr)
 
 void Argument_print(struct Argument *ptr)
 {
+	fprintf(stderr, "(");
 	while (ptr)
 	{
-		fprintf(stderr, "\t%s: ", ptr -> name);			
 		TYPE_print(ptr -> type);
-		fprintf(stderr, "\n");
+		if (ptr -> next != NULL)
+			fprintf(stderr, ", ");
 		ptr = ptr -> next;
 	}
+	fprintf(stderr, ")");
 }
 
 void Function_print(struct FunctionAttribute *ptr)
 {
-	fprintf(stderr, "Return Type: \n");
+	fprintf(stderr, "Return Type: ");
 	TYPE_print(ptr -> return_type);
 	fprintf(stderr, "\n");
 
-	fprintf(stderr, "Arguments: \n");
+	fprintf(stderr, "Arguments: ");
 	Argument_print(ptr -> args);
 	fprintf(stderr, "\n");
 }
@@ -199,6 +202,7 @@ void Attribute_print(struct Attribute *ptr)
 	else if (ptr -> type == Function)
 	{
 		fprintf(stderr, "function: ");
+		fprintf(stderr, "\n");
 		Function_print(ptr -> func);
 		fprintf(stderr, "\n");
 	}
@@ -387,22 +391,30 @@ struct StructureType *SemanticCheck_StructSpecifier_A(void *root)
 	{
 		if (name != NULL)
 		{
-			if (DST_check(DST, struct_type, name))
+			if (DST_check_name(DST, name) != 0)
 			{
 				if (ST_find_scope(ST, name, &Scope) == NULL)
 				{
+					/*
+					if (DST_check_structure(DST, struct_type) == 0)
+					{
+						SemanticChecker(saved_errorline, StructMultiDefined);
+						fprintf(stderr, "\tStruct '%s' \n", name);
+					}
+					else
+					*/
 					DST = DST_insert(DST, name, struct_type);
 				}
 				else
 				{
 					SemanticChecker(saved_errorline, StructMultiDefined);
-					fprintf(stderr, "\tName '%s' used in the previous defined variable/function.\n", name);
+					fprintf(stderr, "\tStruct name '%s' used in the previous defined variable/function\n", name);
 				}
 			}
 			else
 			{
 				SemanticChecker(saved_errorline, StructMultiDefined);
-				fprintf(stderr, "\tName '%s' used in the previous defined struct.\n", name);
+				fprintf(stderr, "\tName '%s' used in the previous defined struct\n", name);
 			}
 		}
 	}
@@ -433,7 +445,7 @@ struct StructureType *SemanticCheck_StructSpecifier_B(void *root)
 	else
 	{
 		SemanticChecker(errorline, StructUndefined);
-		fprintf(stderr, "\tStruct '%s' is previously undefined.\n", name);
+		fprintf(stderr, "\tStruct '%s' is previously undefined\n", name);
 		return NULL;
 	}
 }
@@ -480,7 +492,13 @@ struct SymbolsTable *SemanticCheck_VarDec_A(void *root, struct TYPE *type)
 	if (ST_find_scope(ST, ptr -> id -> name, &Scope) != NULL)
 	{
 		SemanticChecker(errorline, VarMultiDefined);
-		fprintf(stderr, "\tVariable '%s' is previously defined.\n", ptr -> id -> name);
+		fprintf(stderr, "\tVariable '%s' is previously defined / Variable name '%s' conflicts function '%s' previously defined\n", ptr -> id -> name, ptr -> id -> name, ptr -> id -> name);
+		return;
+	}
+	if (DST_check_name(DST, ptr -> id -> name) == 0)
+	{
+		SemanticChecker(errorline, VarMultiDefined);
+		fprintf(stderr, "\tVariable name '%s' conflicts 'struct %s' previously defined\n", ptr -> id -> name, ptr -> id -> name);
 		return;
 	}
 	struct SymbolsTable *new = ST_insert(ST, ptr -> id -> name, &Scope);
@@ -497,7 +515,7 @@ struct StructureType *SemanticCheck_Structure_VarDec_A(void *root, struct TYPE *
 	if (ST_find_scope(SST, ptr -> id -> name, &StructScope) != NULL)
 	{
 		SemanticChecker(errorline, StructDefineError);
-		fprintf(stderr, "\tVariable '%s' is previously defined in the struct.\n", ptr -> id -> name);
+		fprintf(stderr, "\tVariable '%s' is previously defined in the struct\n", ptr -> id -> name);
 		return NULL;
 	}
 
@@ -515,7 +533,7 @@ struct Argument	*SemanticCheck_Argument_VarDec_A(void *root, struct TYPE *type)
 	if (ST_find_scope(ST, ptr -> id -> name, &Scope) != NULL)
 	{
 		SemanticChecker(errorline, FuncArgumentMismatch);
-		fprintf(stderr, "\tVariable '%s' is previously defined in the paramters of the function.\n", ptr -> id -> name);
+		fprintf(stderr, "\tVariable '%s' is previously defined in the paramters of the function\n", ptr -> id -> name);
 		return NULL;
 	}
 
@@ -578,7 +596,7 @@ void SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncSta
 		if (finding -> attr -> type != Function)
 		{
 			SemanticChecker(errorline, UnexpectedError);
-			fprintf(stderr, "\t'%s' redeclared as different kind of symbol.\n", root -> id -> name);
+			fprintf(stderr, "\t'%s' redeclared as different kind of symbol\n", root -> id -> name);
 			return;
 		}
 		else if (finding -> attr -> type != Variable)
@@ -587,7 +605,7 @@ void SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncSta
 			if (attr -> status == Defined && status == Defined)
 			{
 				SemanticChecker(errorline, FuncMultiDefined);
-				fprintf(stderr, "\tFunction '%s' is previously defined.\n", root -> id -> name);
+				fprintf(stderr, "\tFunction '%s' is previously defined\n", root -> id -> name);
 				return;
 			}
 			else
@@ -604,7 +622,7 @@ void SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncSta
 				}
 				errorline = TreeNode_GetLineno(&(root -> tree));
 				SemanticChecker(errorline, FuncDefineConflict);
-				fprintf(stderr, "\tConflicting type for function '%s'.\n", root -> id -> name);
+				fprintf(stderr, "\tConflicting type for function '%s'\n", root -> id -> name);
 				return;
 			}
 		}
@@ -695,7 +713,7 @@ void SemanticCheck_Stmt_Return(void *root, struct TYPE *return_type)
 		SemanticChecker(errorline, ReturnMismatch);
 		fprintf(stderr, "\tExpected return type '");
 		TYPE_print(return_type);	
-		fprintf(stderr, "'.\n");
+		fprintf(stderr, "'\n");
 	}
 }
 
@@ -771,14 +789,18 @@ void SemanticCheck_Dec(struct Dec *root, struct TYPE *type)
 {
 	errorline = TreeNode_GetLineno(&(root -> tree));
 	if (root -> exp != NULL)
-		if (Checking_MatchingType(type, SemanticCheck_Exp(root -> exp)) == 0)
+	{
+		struct TYPE		*exp_type = SemanticCheck_Exp(root -> exp);
+		if (exp_type == NULL) return;
+		if (Checking_MatchingType(type, exp_type) == 0)
 		{
 			SemanticChecker(errorline, ExpMismatch);
 			fprintf(stderr, "\tExpected type '");
 			TYPE_print(type);
-			fprintf(stderr, "'.\n");
+			fprintf(stderr, "'\n");
 			return;
 		}
+	}
 	SemanticCheck_VarDec(root -> vardec, type);
 }
 
@@ -823,7 +845,7 @@ struct StructureType *SemanticCheck_Structure_Dec(struct Dec *root, struct TYPE 
 	if (root -> exp != NULL)
 	{
 		SemanticChecker(errorline, StructDefineError);
-		fprintf(stderr, "\tCannot initialize the variable in struct.\n");
+		fprintf(stderr, "\tCannot initialize the variable in struct\n");
 		return NULL;
 	}
 
@@ -849,7 +871,7 @@ struct TYPE *SemanticCheck_Exp_Assign(void *root)
 	if (ptr -> exp_left -> left_value == 0)
 	{
 		SemanticChecker(errorline, LeftValueError);
-		fprintf(stderr, "\tExpected a L-value as left operand of assignment.\n");
+		fprintf(stderr, "\tExpected a L-value as left operand of assignment\n");
 		return NULL;
 	}
 
@@ -858,7 +880,7 @@ struct TYPE *SemanticCheck_Exp_Assign(void *root)
 		SemanticChecker(errorline, ExpMismatch);
 		fprintf(stderr, "\tExpected type '");
 		TYPE_print(L);
-		fprintf(stderr, "'.\n");
+		fprintf(stderr, "'\n");
 		return NULL;
 	}
 	return L;
@@ -911,11 +933,11 @@ struct TYPE *SemanticCheck_Exp_Binary_Cal(void *root)
 		if (Checking_MatchingType(L, R) == 0)
 		{
 			SemanticChecker(errorline, OpTypeMismatch);
-			fprintf(stderr, "\tInvalid operands to binary %s (have '");
+			fprintf(stderr, "\tInvalid operands to binary %s (have '", Sign_BinaryOP(ptr -> op));
 			TYPE_print(L);
 			fprintf(stderr, "' and '");
 			TYPE_print(R);
-			fprintf(stderr, "').\n");
+			fprintf(stderr, "')\n");
 			return NULL;
 		}
 	}
@@ -964,7 +986,7 @@ struct TYPE *SemanticCheck_Exp_Function(void *root)
 	if (finding == NULL)
 	{
 		SemanticChecker(errorline, FuncUndefined);
-		fprintf(stderr, "\tFunction '%s' is previously undefined.\n", ptr -> func -> name);
+		fprintf(stderr, "\tFunction '%s' is previously undefined\n", ptr -> func -> name);
 		return NULL;
 	}
 
@@ -973,7 +995,7 @@ struct TYPE *SemanticCheck_Exp_Function(void *root)
 	if (finding -> attr -> type != Function)
 	{
 		SemanticChecker(errorline, FuncCallOpError);
-		fprintf(stderr, "\t'%s' is NOT a function.\n", ptr -> func -> name);
+		fprintf(stderr, "\t'%s' is NOT a function\n", ptr -> func -> name);
 		return NULL;
 	}
 
@@ -981,7 +1003,9 @@ struct TYPE *SemanticCheck_Exp_Function(void *root)
 	if (!Checking_Argument_Args(ptr -> args, attr -> args))
 	{
 		SemanticChecker(errorline, FuncArgumentMismatch);
-		fprintf(stderr, "\tIncompatible arguments to function '%s'.\n", ptr -> func -> name);
+		fprintf(stderr, "\tIncompatible arguments to function '%s', expected type '", ptr -> func -> name);
+		Argument_print(attr -> args);
+		fprintf(stderr, "'\n");
 		return NULL;
 	}
 	return (attr -> return_type);
@@ -997,7 +1021,7 @@ struct TYPE *SemanticCheck_Exp_Array(void *root)
 	if (index -> level != Basic || index -> basic != TYPE_INT)
 	{
 		SemanticChecker(errorline, ArrayAccessError);
-		fprintf(stderr, "\tArray subscript is NOT an integer.\n");
+		fprintf(stderr, "\tArray subscript is NOT an integer\n");
 		return NULL;
 	}
 
@@ -1007,7 +1031,7 @@ struct TYPE *SemanticCheck_Exp_Array(void *root)
 	if (inner -> level != Array)
 	{
 		SemanticChecker(errorline, ArrayOpError);
-		fprintf(stderr, "\tIt is NOT an array.\n");
+		fprintf(stderr, "\tIt is NOT an array\n");
 		return NULL;
 	}
 
@@ -1024,7 +1048,7 @@ struct TYPE *SemanticCheck_Exp_Attribute(void *root)
 	if (head -> level != Structure)
 	{
 		SemanticChecker(errorline, StructAttributeError);
-		fprintf(stderr, "\tRequest for member '%s' in something NOT a structure.\n", ptr -> attribute -> name);
+		fprintf(stderr, "\tRequest for member '%s' in something NOT a structure\n", ptr -> attribute -> name);
 		return NULL;
 	}
 
@@ -1034,7 +1058,7 @@ struct TYPE *SemanticCheck_Exp_Attribute(void *root)
 			return (entry -> type);
 
 	SemanticChecker(errorline, AccessStructUndefinedField);
-	fprintf(stderr, "\tStruct has no member named '%s'.\n", ptr -> attribute -> name);
+	fprintf(stderr, "\tStruct has no member named '%s'\n", ptr -> attribute -> name);
 	return NULL;
 }
 
@@ -1055,7 +1079,7 @@ struct TYPE *SemanticCheck_Exp_Variable(void *root)
 	if (finding == NULL)
 	{
 		SemanticChecker(errorline, VarUndefined);
-		fprintf(stderr, "\tVariable '%s' is previously undefined.\n", ptr -> var -> name);
+		fprintf(stderr, "\tVariable '%s' is previously undefined\n", ptr -> var -> name);
 		return NULL;
 	}
 	assert(!(finding -> attr == NULL));
@@ -1064,7 +1088,7 @@ struct TYPE *SemanticCheck_Exp_Variable(void *root)
 	{
 		// Not a variable
 		SemanticChecker(errorline, VarUndefined);
-		fprintf(stderr, "\t'%s' is NOT a variable.\n", ptr -> var -> name);
+		fprintf(stderr, "\t'%s' is NOT a variable\n", ptr -> var -> name);
 		return NULL;
 	}
 	struct VariableAttribute	*attr = finding -> attr -> var;
@@ -1081,7 +1105,7 @@ void Checking_DFL(void)
 	for (ptr = DFL; ptr != NULL; ptr = ptr -> next)
 	{
 		SemanticChecker(ptr -> lineno, FuncDeclareButUndefined);
-		fprintf(stderr, "\tFunction '%s' is declared but undefined.\n", ptr -> name);
+		fprintf(stderr, "\tFunction '%s' is declared but undefined\n", ptr -> name);
 	}
 
 }

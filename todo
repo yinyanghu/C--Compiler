@@ -2,7 +2,7 @@ memory collection
 
 Variable initial value ??
 
-DST_check
+//DST_check
 
 //function declaration
 
@@ -10,4 +10,4 @@ DST_check
 
 
 question:
-1. struct name vs. variable name
+//1. struct name vs. variable name

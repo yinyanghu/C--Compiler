@@ -433,4 +433,6 @@ void Visit_DataType(DataType);
 void Visit_BinaryOP_Calop(BinaryOP_Calop);
 void Visit_UnaryOP(UnaryOP);
 
+//char	*Sign_UnaryOP(UnaryOP);
+char	*Sign_BinaryOP(BinaryOP_Calop);
 #endif

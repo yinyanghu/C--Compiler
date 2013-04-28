@@ -214,14 +214,37 @@ void Scope_print(struct ScopeType *scope)
 	}
 }
 
-// NO
-int DST_check(struct DynamicStructureTable *dst, struct StructureType *attr, char *name)
+// YES
+int DST_check_name(struct DynamicStructureTable *dst, char *name)
 {
-	struct DynamicStructureTable *ptr;		// ptr --> useless
-	for (ptr = dst; ptr != NULL; ptr = ptr -> next)
-		if (strcmp(ptr -> name, name) == 0) return 0;
+	for (; dst != NULL; dst = dst -> next)
+		if (strcmp(dst -> name, name) == 0) return 0;
 	return 1;
 }
+
+/*
+// YES
+int DST_check_structure(struct DynamicStructureTable *dst, struct StructureType *attr)
+{
+	struct TYPE		*L = (struct TYPE *)malloc(sizeof(struct TYPE));
+	struct TYPE		*R = (struct TYPE *)malloc(sizeof(struct TYPE));
+
+	L -> level = R -> level = Structure;
+	L -> structure = attr;
+
+	for (; dst != NULL; dst = dst -> next)
+	{
+		R -> structure = dst -> attr;
+		if (Checking_MatchingType(L, R) == 0)
+		{
+			free(L); free(R);
+			return 0;
+		}
+	}
+	free(L); free(R);
+	return 1;
+}
+*/
 
 // YES
 struct DynamicStructureTable *DST_insert(struct DynamicStructureTable *dst, char *name, struct StructureType *attr)
@@ -255,9 +278,8 @@ void DST_remove(struct DynamicStructureTable **dst, int scope)
 
 struct DynamicStructureTable *DST_find(struct DynamicStructureTable *dst, char *name)
 {
-	struct DynamicStructureTable *ptr;		// ptr --> useless
-	for (ptr = dst; ptr != NULL; ptr = ptr -> next)
-		if (strcmp(ptr -> name, name) == 0) return ptr;
+	for (; dst != NULL; dst = dst -> next)
+		if (strcmp(dst -> name, name) == 0) return dst;
 	return NULL;
 }
 
@@ -281,11 +303,10 @@ void DST_clear(void)
 
 void DST_print(struct DynamicStructureTable *dst)
 {
-	struct DynamicStructureTable *ptr;
-	for (ptr = dst; ptr != NULL; ptr = ptr -> next)
+	for (; dst != NULL; dst = dst -> next)
 	{
-		printf("Name: %s, Scope: %d\n", ptr -> name, ptr -> scope);
-		Structure_print(ptr -> attr);
+		printf("Name: %s, Scope: %d\n", dst -> name, dst -> scope);
+		Structure_print(dst -> attr);
 		printf("\n");
 	}
 

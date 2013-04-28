@@ -1211,3 +1211,29 @@ void Visit_UnaryOP(UnaryOP v) //except case: (Exp)
 		IPrint("MINUS");
 	}
 }
+
+/*
+char *Sign_UnaryOP(UnaryOP v)
+{
+	if (v == OP_NOT)
+		return "!";
+	else
+		return "-";
+}
+*/
+
+char *Sign_BinaryOP(BinaryOP_Calop v)
+{
+	if (v == OP_PLUS)
+		return "+";
+	else if (v == OP_MINUS)
+		return "-";
+	else if (v == OP_STAR)
+		return "*";
+	else if (v == OP_DIV)
+		return "/";
+	else if (v == OP_AND)
+		return "&&";
+	else
+		return "||";
+}

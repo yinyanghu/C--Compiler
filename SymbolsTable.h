@@ -100,7 +100,9 @@ void DST_remove(struct DynamicStructureTable **, int);
 
 struct DynamicStructureTable *DST_find(struct DynamicStructureTable *, char *);
 
-int DST_check(struct DynamicStructureTable *, struct StructureType *, char *);
+int DST_check_name(struct DynamicStructureTable *, char *);
+
+//int DST_check_structure(struct DynamicStructureTable *, struct StructureType *);
 
 void DST_print(struct DynamicStructureTable *);
 
