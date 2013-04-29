@@ -137,7 +137,7 @@ void					SemanticCheck_DecList(struct DecList *, struct TYPE *);
 void					SemanticCheck_Dec(struct Dec *, struct TYPE *);
 
 
-void					SemanticCheck_FunDec(struct FunDec *, struct TYPE *, FuncStatus);
+int						SemanticCheck_FunDec(struct FunDec *, struct TYPE *, FuncStatus);
 struct Argument			*SemanticCheck_VarList(struct VarList *);
 struct Argument			*SemanticCheck_ParamDec(struct ParamDec *);
 

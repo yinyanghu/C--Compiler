@@ -300,8 +300,8 @@ void SemanticCheck_ExtDef_C(void *root)
 		return;
 	}
 
-	SemanticCheck_FunDec(ptr -> fundec, return_type, Defined);
-	SemanticCheck_CompSt(ptr -> compst, return_type);
+	if (SemanticCheck_FunDec(ptr -> fundec, return_type, Defined) == 0)
+		SemanticCheck_CompSt(ptr -> compst, return_type);
 	Scope_pop(&Scope);
 	DST_Global();
 }
@@ -584,7 +584,7 @@ struct Argument	*SemanticCheck_Argument_VarDec_B(void *root, struct TYPE *type)
 }
 
 // YES
-void SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncStatus status)
+int SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncStatus status)
 {
 	errorline = TreeNode_GetLineno(&(root -> tree));
 	struct SymbolsTable		*finding = ST_find_scope(ST, root -> id -> name, &Scope);
@@ -597,7 +597,7 @@ void SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncSta
 		{
 			SemanticChecker(errorline, UnexpectedError);
 			fprintf(stderr, "\t'%s' redeclared as different kind of symbol\n", root -> id -> name);
-			return;
+			return -1;
 		}
 		else if (finding -> attr -> type != Variable)
 		{
@@ -606,7 +606,7 @@ void SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncSta
 			{
 				SemanticChecker(errorline, FuncMultiDefined);
 				fprintf(stderr, "\tFunction '%s' is previously defined\n", root -> id -> name);
-				return;
+				return -1;
 			}
 			else
 			{
@@ -618,17 +618,16 @@ void SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncSta
 						attr -> status = Defined;
 						DFL_remove(&DFL, root -> id -> name);
 					}
-					return;
+					return 0;
 				}
 				errorline = TreeNode_GetLineno(&(root -> tree));
 				SemanticChecker(errorline, FuncDefineConflict);
 				fprintf(stderr, "\tConflicting type for function '%s'\n", root -> id -> name);
-				return;
+				return -1;
 			}
 		}
 		else
 			fprintf(stderr, "Fucking!\n");
-		return; // <----- useless
 	}
 
 	struct SymbolsTable *func = ST_insert(ST, root -> id -> name, &Scope);
@@ -645,6 +644,7 @@ void SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncSta
 		errorline = TreeNode_GetLineno(&(root -> tree));
 		DFL = DFL_insert(DFL, root -> id -> name, errorline);
 	}
+	return 0;
 }
 
 // YES?
@@ -798,7 +798,7 @@ void SemanticCheck_Dec(struct Dec *root, struct TYPE *type)
 			fprintf(stderr, "\tExpected type '");
 			TYPE_print(type);
 			fprintf(stderr, "'\n");
-			return;
+			//return;
 		}
 	}
 	SemanticCheck_VarDec(root -> vardec, type);

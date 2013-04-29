@@ -25,15 +25,11 @@ int f(int a, int b)
 	P = Q;
 }
 
-	
 int f(int a, int b);
 
 int A[20][230];
 
-
-
 int main()
 {
 	int B[10];
-
 }

@@ -7,10 +7,14 @@ A simplified C Compiler
 * [x] Basic Framework
 * [x] Lexical Analyser
 * [x] Syntax Analyser
-* [ ] Semantic Analyser
+* [x] Semantic Analyser
 
 
 ## Timeline
+
+* April 28, 2013:
+
+> Semantic Analyser: Debug, Test(Con't)
 
 * April 23, 2013:
 
