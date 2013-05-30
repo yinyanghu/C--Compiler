@@ -1,0 +1,10 @@
+struct Complex
+{
+	float real, image;
+};
+int main()
+{
+	struct Complex c;
+	c.real = 1.2;
+	c.image = 3.6;
+}

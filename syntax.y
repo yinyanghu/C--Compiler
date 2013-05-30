@@ -469,8 +469,9 @@ Exp					:	Exp ASSIGNOP Exp
 						{
 							$$ = Build_Exp((void *)Build_Exp_FLOAT($1), 0, &Visit_Exp_FLOAT, &SemanticCheck_Exp_FLOAT, @$.first_line);
 						}
-					|	LP error RP
+					|	LP error
 						{
+							// LP error RP
 							SyntaxErrorReport(yylineno, "Expected a expression before ')' token");
 							yyerrok;
 						}
