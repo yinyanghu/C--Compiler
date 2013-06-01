@@ -9,6 +9,7 @@ Object = LexChecker.o \
 		 SyntaxChecker.o \
 		 utility.o \
 		 SemanticChecker.o \
+		 IR.o \
 		 AST.o \
 		 SymbolsTable.o \
 		 syntax.tab.o \

@@ -1,9 +1,6 @@
 #ifndef SYMBOLSTABLE_H
 #define SYMBOLSTABLE_H
 
-#include "const.h"
-#include "SemanticChecker.h"
-
 #define HashingPrime	997
 #define MaxScope		15
 #define GlobalScope		0
@@ -59,6 +56,7 @@ struct DeclaredFunctionList {
 	char name[NameSize];
 	struct DeclaredFunctionList	*next;
 };
+
 
 /*
 int IntHashing(int);
@@ -133,5 +131,21 @@ extern struct DynamicStructureTable		*DST;
 extern int	DST_Scope;
 
 extern struct DeclaredFunctionList		*DFL;
+
+
+
+// For IR Code
+struct IRSymbolsTable {
+	char name[NameSize];
+	struct Attribute		*attr;
+	struct IRSymbolsTable	*next, *prev;
+};
+
+struct IRSymbolsTable *IRST_insert(struct IRSymbolsTable **, char *);
+struct IRSymbolsTable *IRST_find(struct IRSymbolsTable **, char *);
+void IRST_clear(struct IRSymbolsTable **);
+void IRST_test(struct IRSymbolsTable **);
+
+extern struct IRSymbolsTable			*IRST[HashingPrime];
 
 #endif

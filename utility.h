@@ -1,11 +1,11 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <stdio.h>
-
 #define OCT_STRING	8
 #define DEC_STRING	10
 #define HEX_STRING	16
+
+#include <stdio.h>
 
 
 //#define PRINT_INDENT(Y)	printf("%"#Y"s","")

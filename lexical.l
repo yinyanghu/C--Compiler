@@ -1,10 +1,9 @@
 %{
-
+	#include <string.h>
 	#include "const.h"
 	#include "utility.h"
 	#include "LexChecker.h"
 	#include "syntax.tab.h"
-	#include <string.h>
 
 	int yycolumnno = 1;
 

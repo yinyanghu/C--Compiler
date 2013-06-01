@@ -1,7 +1,8 @@
-#include "AST.h"
-#include "utility.h"
 #include <stdlib.h>
 #include <string.h>
+#include "cmm.h"
+
+int indent;
 
 /* TreeNode */
 
@@ -40,7 +41,7 @@ struct ExtDefList *Build_ExtDefList(struct ExtDef *child_A, struct ExtDefList *c
 	return ptr;
 }
 
-struct ExtDef *Build_ExtDef(void *child, void (*func_visit)(void *), void (*func_sc)(void *), int lineno)
+struct ExtDef *Build_ExtDef(void *child, void (*func_visit)(void *), void (*func_sc)(void *), struct IRChain *(*func_ir)(void *), int lineno)
 {
 	struct ExtDef	*ptr = (struct ExtDef *)malloc(sizeof(struct ExtDef));
 
@@ -49,6 +50,7 @@ struct ExtDef *Build_ExtDef(void *child, void (*func_visit)(void *), void (*func
 
 	ptr -> Visit = func_visit;
 	ptr -> SemanticCheck = func_sc;
+	ptr -> IR = func_ir;
 
 	return ptr;
 }
@@ -195,7 +197,7 @@ struct Tag *Build_Tag(struct ID *child, int lineno)
 }
 
 
-struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct SymbolsTable *(*func_sc)(void *, struct TYPE *), struct StructureType *(*func_ssc)(void *, struct TYPE *), struct Argument *(*func_spc)(void *, struct TYPE *), int lineno)
+struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct SymbolsTable *(*func_sc)(void *, struct TYPE *), struct StructureType *(*func_ssc)(void *, struct TYPE *), struct Argument *(*func_spc)(void *, struct TYPE *), struct IRChain *(*func_ir)(void *), int lineno)
 {
 	struct VarDec	*ptr = (struct VarDec *)malloc(sizeof(struct VarDec));
 
@@ -206,6 +208,7 @@ struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct Symb
 	ptr -> SemanticCheck = func_sc;
 	ptr -> SemanticStructCheck = func_ssc;
 	ptr -> SemanticArgumentCheck = func_spc;
+	ptr -> IR = func_ir;
 
 	return ptr;
 }
@@ -285,7 +288,7 @@ struct StmtList *Build_StmtList(struct Stmt *child_A, struct StmtList *child_B, 
 	return ptr;
 }
 
-struct Stmt *Build_Stmt(void *child, void (*func_visit)(void *), void (*func_sc)(void *, struct TYPE *), int lineno)
+struct Stmt *Build_Stmt(void *child, void (*func_visit)(void *), void (*func_sc)(void *, struct TYPE *), struct IRChain *(*func_ir)(void *), int lineno)
 {
 	struct Stmt		*ptr = (struct Stmt *)malloc(sizeof(struct Stmt));
 
@@ -294,6 +297,7 @@ struct Stmt *Build_Stmt(void *child, void (*func_visit)(void *), void (*func_sc)
 
 	ptr -> Visit = func_visit;
 	ptr -> SemanticCheck = func_sc;
+	ptr -> IR = func_ir;
 
 	return ptr;
 }
@@ -403,7 +407,7 @@ struct Dec *Build_Dec(struct VarDec *child_A, struct Exp *child_B, int lineno)
 	return ptr;
 }
 
-struct Exp *Build_Exp(void *child, int LV, void (*func_visit)(void *), struct TYPE *(*func_sc)(void *), int lineno)
+struct Exp *Build_Exp(void *child, int LV, void (*func_visit)(void *), struct TYPE *(*func_sc)(void *), struct IRChain *(*func_ir)(void *, struct Operand *), struct IRChain *(*func_irc)(void *, int, int), int lineno)
 {
 	struct Exp		*ptr = (struct Exp *)malloc(sizeof(struct Exp));
 
@@ -415,6 +419,8 @@ struct Exp *Build_Exp(void *child, int LV, void (*func_visit)(void *), struct TY
 
 	ptr -> Visit = func_visit;
 	ptr -> SemanticCheck = func_sc;
+	ptr -> IR = func_ir;
+	ptr -> IR_Condition = func_irc;
 
 	return ptr;
 }

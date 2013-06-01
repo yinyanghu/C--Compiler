@@ -1,78 +1,7 @@
 #ifndef SEMANTICCHECKER_H
 #define SEMANTICCHECKER_H
 
-#include "const.h"
-
 extern int ErrorCounter;
-
-struct ArrayType {
-	struct TYPE		*next;
-	int				size;
-};
-
-struct StructureType {
-	char					name[NameSize];
-	struct TYPE				*type;
-	struct StructureType	*next;
-};
-
-struct TYPE {
-	enum {
-		Basic, Array, Structure//,Error
-	} level;
-
-	union {
-		DataType				basic;
-		struct ArrayType		*array;
-		struct StructureType	*structure;
-	};
-};
-
-struct Argument {
-	struct TYPE			*type;
-	char				name[NameSize];
-	struct Argument		*next;
-};
-
-typedef enum {
-	Declared,
-	Defined
-} FuncStatus;
-
-struct FunctionAttribute {
-	struct TYPE			*return_type;		
-	struct Argument		*args;
-	unsigned int		address;
-	int					size;
-	FuncStatus			status;
-};
-
-
-struct VariableAttribute {
-	struct TYPE		*type;
-	union
-	{
-		int			v_int;
-		float		v_float;
-	};
-	unsigned int	address;
-	int				size;
-};
-
-typedef enum {
-	Variable,
-	Function
-} AttributeType;
-
-struct Attribute {
-	AttributeType					type;
-	union {
-		struct FunctionAttribute	*func;
-		struct VariableAttribute	*var;
-	};
-};
-
-#include "AST.h"
 
 void SemanticChecker(int, int);
 void SemanticAnalysis(struct Program *);
@@ -85,12 +14,13 @@ void Function_print(struct FunctionAttribute *);
 void Argument_print(struct Argument *);
 
 void						Build_TYPE_Basic(void);
-struct Argument				*Build_Argument(char *, struct TYPE *, struct Argument *);
+struct Argument				*Build_Argument(/* char *, */struct TYPE *, struct Argument *);
 struct ArrayType			*Build_Array(struct TYPE *, int);
-struct VariableAttribute	*Build_VariableAttribute(struct TYPE *, int, float, unsigned int, int);
+struct VariableAttribute	*Build_VariableAttribute(struct TYPE *, int, float, unsigned int, int, int);
 struct StructureType		*Build_Structure(char *, struct TYPE *, struct StructureType *);
 struct FunctionAttribute	*Build_FunctionAttribute(struct TYPE *, struct Argument *, unsigned int, int, FuncStatus);
-struct Attribute			*Build_Attribute(AttributeType, struct FunctionAttribute *, struct VariableAttribute *);
+struct StructureAttribute	*Build_StructureAttribute(struct StructureType *, int);
+struct Attribute			*Build_Attribute(AttributeType, struct FunctionAttribute *, struct VariableAttribute *, struct StructureAttribute *);
 
 void Remove_Structure(struct StructureType *);
 

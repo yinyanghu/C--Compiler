@@ -1,10 +1,8 @@
-#include "SemanticChecker.h"
-#include "SymbolsTable.h"
-#include "const.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "cmm.h"
 
 struct TYPE		*basic_int, *basic_float;
 
@@ -53,11 +51,11 @@ void Build_TYPE_Basic(void)
 }
 
 // YES
-struct Argument	*Build_Argument(char *name, struct TYPE *type, struct Argument *next)
+struct Argument	*Build_Argument(/* char *name, */struct TYPE *type, struct Argument *next)
 {
 	struct Argument	*ptr = (struct Argument *)malloc(sizeof(struct Argument));
 
-	strcpy(ptr -> name, name);
+	//strcpy(ptr -> name, name);
 	ptr -> type = type;
 	ptr -> next = next;
 
@@ -86,7 +84,7 @@ struct StructureType	*Build_Structure(char *name, struct TYPE *type, struct Stru
 	return ptr;
 }
 
-struct VariableAttribute	*Build_VariableAttribute(struct TYPE *type, int vint, float vfloat, unsigned int address, int size)
+struct VariableAttribute	*Build_VariableAttribute(struct TYPE *type, int vint, float vfloat, unsigned int address, int size, int no)
 {
 	struct VariableAttribute	*ptr = (struct VariableAttribute *)malloc(sizeof(struct VariableAttribute));
 	ptr -> type = type;
@@ -96,6 +94,7 @@ struct VariableAttribute	*Build_VariableAttribute(struct TYPE *type, int vint, f
 		ptr -> v_float = vfloat;
 	ptr -> address = address;
 	ptr -> size = size;
+	ptr -> no = no;
 
 	return ptr;
 }
@@ -113,7 +112,17 @@ struct FunctionAttribute	*Build_FunctionAttribute(struct TYPE *type, struct Argu
 	return ptr;
 }
 
-struct Attribute	*Build_Attribute(AttributeType attr_type, struct FunctionAttribute *func, struct VariableAttribute *var)
+struct StructureAttribute	*Build_StructureAttribute(struct StructureType *type, int size)
+{
+	struct StructureAttribute	*ptr = (struct StructureAttribute *)malloc(sizeof(struct StructureAttribute));
+
+	ptr -> type = type;
+	ptr -> size = size;
+
+	return ptr;
+}
+
+struct Attribute	*Build_Attribute(AttributeType attr_type, struct FunctionAttribute *func, struct VariableAttribute *var, struct StructureAttribute *structure)
 {
 	struct Attribute	*ptr = (struct Attribute *)malloc(sizeof(struct Attribute));
 
@@ -123,6 +132,8 @@ struct Attribute	*Build_Attribute(AttributeType attr_type, struct FunctionAttrib
 		ptr -> var = var;
 	else if (attr_type == Function)
 		ptr -> func = func;
+	else if (attr_type == Struct)
+		ptr -> structure = structure;
 	else
 		fprintf(stderr, "Fucking!\n");
 
@@ -228,7 +239,12 @@ void SemanticAnalysis(struct Program *AST)
 	DST_clear();
 	DFL_clear();
 
+	// For IR Code
+	IRST_clear(IRST);
+
 	SemanticCheck_Program(AST);
+
+	IRST_test(IRST);
 
 	/*
 	fprintf(stderr, "=================================\n");
@@ -244,9 +260,24 @@ void SemanticAnalysis(struct Program *AST)
 void SemanticCheck_Program(struct Program *root)
 {
 	errorline = TreeNode_GetLineno(&(root -> tree));
+
 	Scope_push(&Scope);
 
+	// Read(), Write()
+	struct IRSymbolsTable *IRread = IRST_insert(IRST, "read");
+	struct SymbolsTable	*read = ST_insert(ST, "read", &Scope);
+	struct Attribute *read_attr = Build_Attribute(Function, Build_FunctionAttribute(basic_int, NULL, 0, 0, Defined), NULL, NULL);
+	IRread -> attr = read -> attr = read_attr;
+
+
+	struct IRSymbolsTable *IRwrite = IRST_insert(IRST, "write");
+	struct SymbolsTable	*write = ST_insert(ST, "write", &Scope);
+	struct Attribute *write_attr = Build_Attribute(Function, Build_FunctionAttribute(basic_int, Build_Argument(basic_int, NULL), 0, 0, Defined), NULL, NULL);
+	IRwrite -> attr = write -> attr = write_attr;
+
 	SemanticCheck_ExtDefList(root -> extdeflist);
+
+	// Here: Scope_top = 1
 
 	Checking_DFL();
 }
@@ -404,6 +435,11 @@ struct StructureType *SemanticCheck_StructSpecifier_A(void *root)
 					else
 					*/
 					DST = DST_insert(DST, name, struct_type);
+					
+					// For IR Code
+					struct IRSymbolsTable *IRnew = IRST_insert(IRST, name);
+					IRnew -> attr = Build_Attribute(Struct, NULL, NULL, Build_StructureAttribute(struct_type, 0));
+					
 				}
 				else
 				{
@@ -502,8 +538,11 @@ struct SymbolsTable *SemanticCheck_VarDec_A(void *root, struct TYPE *type)
 		return;
 	}
 	struct SymbolsTable *new = ST_insert(ST, ptr -> id -> name, &Scope);
+	new -> attr = Build_Attribute(Variable, NULL, Build_VariableAttribute(type, 0, 0, 0, 0, -1), NULL);	// <-----
 
-	new -> attr = Build_Attribute(Variable, NULL, Build_VariableAttribute(type, 0, 0, 0, 0));	// <-----
+	// For IR Code
+	struct IRSymbolsTable *IRnew = IRST_insert(IRST, ptr -> id -> name);
+	IRnew -> attr = new -> attr;		// <---- Bug?
 
 	return new;
 }
@@ -520,8 +559,7 @@ struct StructureType *SemanticCheck_Structure_VarDec_A(void *root, struct TYPE *
 	}
 
 	struct SymbolsTable *new = ST_insert(SST, ptr -> id -> name, &StructScope);
-
-	new -> attr = Build_Attribute(Variable, NULL, Build_VariableAttribute(type, 0, 0, 0, 0));	// <-----
+	new -> attr = Build_Attribute(Variable, NULL, Build_VariableAttribute(type, 0, 0, 0, 0, -1), NULL);	// <-----
 
 	return Build_Structure(ptr -> id -> name, type, NULL);
 }
@@ -538,10 +576,13 @@ struct Argument	*SemanticCheck_Argument_VarDec_A(void *root, struct TYPE *type)
 	}
 
 	struct SymbolsTable * new = ST_insert(ST, ptr -> id -> name, &Scope);
+	new -> attr = Build_Attribute(Variable, NULL, Build_VariableAttribute(type, 0, 0, 0, 0, -1), NULL);	// <-----
 
-	new -> attr = Build_Attribute(Variable, NULL, Build_VariableAttribute(type, 0, 0, 0, 0));	// <-----
+	// For IR Code
+	struct IRSymbolsTable *IRnew = IRST_insert(IRST, ptr -> id -> name);
+	IRnew -> attr = new -> attr;		// <---- Bug?
 
-	return Build_Argument(ptr -> id -> name, type, NULL);
+	return Build_Argument(/* ptr -> id -> name, */type, NULL);
 }
 
 // NO
@@ -637,7 +678,11 @@ int SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncStat
 
 	struct Argument *args = SemanticCheck_VarList(root -> varlist);
 
-	func -> attr = Build_Attribute(Function, Build_FunctionAttribute(return_type, args, 0, 0, status), NULL); // <------
+	func -> attr = Build_Attribute(Function, Build_FunctionAttribute(return_type, args, 0, 0, status), NULL, NULL); // <------
+
+	// For IR Code
+	struct IRSymbolsTable *IRnew = IRST_insert(IRST, root -> id -> name);
+	IRnew -> attr = func -> attr;		// <---- Bug?
 	
 	if (status == Declared)
 	{

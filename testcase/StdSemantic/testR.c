@@ -15,6 +15,8 @@ struct Complex1
 	float image = 4.7;
 };
 
+int duplicate;
+
 int abs(int f1, int f2)
 {
 	undefined = 1;
@@ -24,7 +26,6 @@ int abs(int f1, int f2)
 
 int main()
 {
-	int duplicate;
 	float assign;
 	int i,j, a[10][10], b[5];
 	struct Complex x;

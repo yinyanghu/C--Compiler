@@ -1,6 +1,5 @@
-#include "LexChecker.h"
-#include "const.h"
 #include <stdio.h>
+#include "cmm.h"
 
 void LexChecker(int lineno, char *text, char *error_type, char *message)
 {

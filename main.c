@@ -1,12 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "const.h"
-#include "utility.h"
-#include "LexChecker.h"
-#include "SyntaxChecker.h"
-#include "SemanticChecker.h"
-#include "AST.h"
-#include "syntax.tab.h"
+#include "cmm.h"
 
 struct Program		*AST;
 
@@ -54,6 +48,10 @@ int main(int argc, char **argv)
 
 	/*Visit_Program(AST);*/
 	SemanticAnalysis(AST);
+
+	if (ErrorCounter != 0) return 0;
+
+	GeneratingIR(AST);
 
 	return 0;
 }
