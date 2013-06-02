@@ -14,7 +14,7 @@ void Function_print(struct FunctionAttribute *);
 void Argument_print(struct Argument *);
 
 void						Build_TYPE_Basic(void);
-struct Argument				*Build_Argument(/* char *, */struct TYPE *, struct Argument *);
+struct Argument				*Build_Argument(char *, struct TYPE *, struct Argument *);
 struct ArrayType			*Build_Array(struct TYPE *, int);
 struct VariableAttribute	*Build_VariableAttribute(struct TYPE *, int, float, unsigned int, int, int);
 struct StructureType		*Build_Structure(char *, struct TYPE *, struct StructureType *);

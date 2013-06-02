@@ -431,7 +431,7 @@ Exp					:	Exp ASSIGNOP Exp
 						}
 					|	LP Exp RP
 						{
-							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_PAR), 0, &Visit_Exp_Unary, &SemanticCheck_Exp_Unary, NULL, NULL, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Unary($2, OP_PAR), 0, &Visit_Exp_Unary, &SemanticCheck_Exp_Unary, &IR_Exp_Par, &IR_Condition_Par, @$.first_line);
 						}
 					|	MINUS Exp
 						{
@@ -443,11 +443,11 @@ Exp					:	Exp ASSIGNOP Exp
 						}
 					|	ID LP Args RP
 						{
-							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), $3), 0, &Visit_Exp_Function, &SemanticCheck_Exp_Function, NULL, NULL, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), $3), 0, &Visit_Exp_Function, &SemanticCheck_Exp_Function, &IR_Exp_Function, NULL, @$.first_line);
 						}
 					|	ID LP RP
 						{
-							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), NULL), 0, &Visit_Exp_Function, &SemanticCheck_Exp_Function, NULL, NULL, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Function(Build_ID($1), NULL), 0, &Visit_Exp_Function, &SemanticCheck_Exp_Function, &IR_Exp_Function, NULL, @$.first_line);
 						}
 					|	Exp LB Exp RB
 						{

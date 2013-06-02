@@ -197,7 +197,7 @@ struct Tag *Build_Tag(struct ID *child, int lineno)
 }
 
 
-struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct SymbolsTable *(*func_sc)(void *, struct TYPE *), struct StructureType *(*func_ssc)(void *, struct TYPE *), struct Argument *(*func_spc)(void *, struct TYPE *), struct IRChain *(*func_ir)(void *), int lineno)
+struct VarDec *Build_VarDec(void *child, void (*func_visit)(void *), struct SymbolsTable *(*func_sc)(void *, struct TYPE *), struct StructureType *(*func_ssc)(void *, struct TYPE *), struct Argument *(*func_spc)(void *, struct TYPE *), struct IRChain *(*func_ir)(void *, struct Operand *), int lineno)
 {
 	struct VarDec	*ptr = (struct VarDec *)malloc(sizeof(struct VarDec));
 

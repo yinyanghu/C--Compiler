@@ -20,7 +20,7 @@ struct StructSpecifier_A	*Build_StructSpecifier_A(struct OptTag *, struct DefLis
 struct StructSpecifier_B	*Build_StructSpecifier_B(struct Tag *);
 struct OptTag				*Build_OptTag(struct ID *, int);
 struct Tag					*Build_Tag(struct ID *, int);
-struct VarDec				*Build_VarDec(void *, void (*)(void *), struct SymbolsTable *(*)(void *, struct TYPE *), struct StructureType *(*)(void *, struct TYPE *), struct Argument *(*)(void *, struct TYPE *), struct IRChain *(*)(void *), int);
+struct VarDec				*Build_VarDec(void *, void (*)(void *), struct SymbolsTable *(*)(void *, struct TYPE *), struct StructureType *(*)(void *, struct TYPE *), struct Argument *(*)(void *, struct TYPE *), struct IRChain *(*)(void *, struct Operand *), int);
 struct VarDec_A				*Build_VarDec_A(struct ID *);
 struct VarDec_B				*Build_VarDec_B(struct VarDec *, struct Exp_INT *);
 struct FunDec				*Build_FunDec(struct ID *, struct VarList *, int);

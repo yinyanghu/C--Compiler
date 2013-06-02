@@ -49,10 +49,10 @@ struct Operand	*ID_Operand(char *name)
 
 	int no = get_var(attr -> var);
 
-	return Build_Operand(VARIABLE, no, NULL);
+	return Build_Operand(VARIABLE, no);
 }
 
-struct Operand	*Build_Operand(OperandType type, int key, char *func)
+struct Operand	*Build_Operand(OperandType type, int key)
 {
 	struct Operand		*ptr = (struct Operand *)malloc(sizeof(struct Operand));
 	ptr -> type = type;
@@ -322,8 +322,8 @@ void GeneratingIR(struct Program *AST)
 	TempCounter = LabelCounter = VarCounter = 0;
 
 	// Constant #0, #1
-	Zero = Build_Operand(CONSTANT, 0, NULL);
-	One = Build_Operand(CONSTANT, 1, NULL);
+	Zero = Build_Operand(CONSTANT, 0);
+	One = Build_Operand(CONSTANT, 1);
 
 	IR = IR_Program(AST);
 
@@ -353,15 +353,14 @@ struct IRChain *IR_ExtDef(struct ExtDef *root)
 
 struct IRChain *IR_ExtDef_A(void *root)
 {
+	fprintf(stderr, "You are a Liar!\n");
 	return NULL;
-	// @@@
-	//struct ExtDef_A		*ptr = (struct ExtDef_A *)root;
 }
 
 struct IRChain *IR_ExtDef_B(void *root)
 {
-	return NULL;
 	// @@@
+	return NULL;
 }
 
 struct IRChain *IR_ExtDef_C(void *root)
@@ -376,20 +375,34 @@ struct IRChain *IR_ExtDef_C(void *root)
 
 struct IRChain *IR_ExtDef_D(void *root)
 {
+	fprintf(stderr, "You are a Liar!\n");
 	return NULL;
-	// @@@
 }
 
 struct IRChain *IR_FunDec(struct FunDec *root)
 {
-	struct IRSymbolsTable	*finding = IRST_find(IRST, root -> id -> name);
+	struct Attribute	*attr = IRST_find(IRST, root -> id -> name) -> attr;
 
 	struct IRCode	*code = Build_IRCode(FUNCTION, NULL, NULL, NULL, 0, 0, root -> id -> name);
 
 	struct IRChain	*ret = IRChain_build(code);
 
+	if (attr -> type != Function)
+	{
+		fprintf(stderr, "Fuck 008\n");
+	}
+	
+	struct Argument	*args = attr -> func -> args;
+	while (args)
+	{
+		// @@@
+		struct Operand	*P = ID_Operand(args -> name);
+		struct IRChain	*Pcode = IRChain_build(Build_IRCode(PARAM, P, NULL, NULL, 0, 0, NULL));
+		ret = IRChain_link(ret, Pcode);
+		args = args -> next;
+	}
+
 	return ret;
-	// to be continued...
 }
 
 struct IRChain *IR_CompSt(struct CompSt *root)
@@ -438,7 +451,7 @@ struct IRChain *IR_Stmt_Return(void *root)
 {
 	struct Stmt_Return	*ptr = (struct Stmt_Return *)root;
 
-	struct Operand	*t1 = Build_Operand(TEMP, get_temp(), NULL);
+	struct Operand	*t1 = Build_Operand(TEMP, get_temp());
 
 	struct IRChain	*codeA = IR_Exp(ptr -> exp, t1);
 	struct IRChain	*codeB = IRChain_build(Build_IRCode(RETURNRETURN, t1, NULL, NULL, 0, 0, NULL));
@@ -509,7 +522,7 @@ struct IRChain *IR_Stmt_While(void *root)
 
 	struct IRChain	*codeA = IRChain_build(Build_IRCode(LABEL, NULL, NULL, NULL, 0, l1, NULL));
 	struct IRChain	*codeB = IR_Condition(ptr -> exp, l2, l3);
-	struct IRChain	*codeC = IRChain_build(Build_IRCode(GOTO, NULL, NULL, NULL, 0, l2, NULL));
+	struct IRChain	*codeC = IRChain_build(Build_IRCode(LABEL, NULL, NULL, NULL, 0, l2, NULL));
 	struct IRChain	*codeD = IR_Stmt(ptr -> stmt);
 	struct IRChain	*codeE = IRChain_build(Build_IRCode(GOTO, NULL, NULL, NULL, 0, l1, NULL));
 	struct IRChain	*codeF = IRChain_build(Build_IRCode(LABEL, NULL, NULL, NULL, 0, l3, NULL));
@@ -530,7 +543,7 @@ struct IRChain *IR_Condition(struct Exp *root, int label_true, int label_false)
 		return (root -> IR_Condition(root -> next, label_true, label_false));
 	else
 	{
-		struct Operand	*t1 = Build_Operand(TEMP, get_temp(), NULL);
+		struct Operand	*t1 = Build_Operand(TEMP, get_temp());
 		struct IRChain	*codeA = IR_Exp(root, t1);
 		struct IRChain	*codeB = IRChain_build(Build_IRCode(CONDGOTO, t1, Zero, NULL, OP_NE, label_true, NULL));
 		struct IRChain	*codeC = IRChain_build(Build_IRCode(GOTO, NULL, NULL, NULL, 0, label_false, NULL));
@@ -547,8 +560,8 @@ struct IRChain *IR_Condition_RELOP(void *root, int label_true, int label_false)
 {
 	struct Exp_Binary_Rel	*ptr = (struct Exp_Binary_Rel *)root;
 
-	struct Operand	*t1 = Build_Operand(TEMP, get_temp(), NULL);
-	struct Operand	*t2 = Build_Operand(TEMP, get_temp(), NULL);
+	struct Operand	*t1 = Build_Operand(TEMP, get_temp());
+	struct Operand	*t2 = Build_Operand(TEMP, get_temp());
 
 	struct IRChain	*codeA = IR_Exp(ptr -> exp_a, t1);
 	struct IRChain	*codeB = IR_Exp(ptr -> exp_b, t2);
@@ -569,6 +582,13 @@ struct IRChain *IR_Condition_NOT(void *root, int label_true, int label_false)
 	return IR_Condition(ptr -> exp, label_false, label_true);
 }
 
+struct IRChain *IR_Condition_Par(void *root, int label_true, int label_false)
+{
+	struct Exp_Unary	*ptr = (struct Exp_Unary *)root;
+
+	return IR_Condition(ptr -> exp, label_true, label_false);
+}
+
 struct IRChain *IR_Condition_AND(void *root, int label_true, int label_false)
 {
 	struct Exp_Binary_Cal	*ptr = (struct Exp_Binary_Cal *)root;
@@ -584,7 +604,6 @@ struct IRChain *IR_Condition_AND(void *root, int label_true, int label_false)
 
 	return codeA;
 }
-
 
 
 struct IRChain *IR_Condition_OR(void *root, int label_true, int label_false)
@@ -621,21 +640,26 @@ struct IRChain *IR_DecList(struct DecList *root)
 
 struct IRChain *IR_Dec(struct Dec *root)
 {
+	struct IRChain	*codeA = NULL;
+	struct Operand	*t = NULL;
 	if (root -> exp != NULL)
 	{
-// to be continued...
+		t = Build_Operand(TEMP, get_temp());
+		codeA= IR_Exp(root -> exp, t);
 	}
-	return IR_VarDec(root -> vardec);	
+	struct IRChain	*ret = IR_VarDec(root -> vardec, t);
+	ret = IRChain_link(codeA, ret);
+	return ret;
 }
 
 
-struct IRChain *IR_VarDec(struct VarDec *root)
+struct IRChain *IR_VarDec(struct VarDec *root, struct Operand *value)
 {
-	return (root -> IR(root -> next));
+	return (root -> IR(root -> next, value));
 }
 
 
-struct IRChain *IR_VarDec_A(void *root)
+struct IRChain *IR_VarDec_A(void *root, struct Operand *value)
 {
 	struct VarDec_A		*ptr = (struct VarDec_A *)root;
 	struct Attribute	*attr = IRST_find(IRST, ptr -> id -> name) -> attr;
@@ -651,28 +675,21 @@ struct IRChain *IR_VarDec_A(void *root)
 	}
 
 	int no = get_var(attr -> var);
-	
-	//@@@@
-	
-	if (no == -1)
+
+	if (value != NULL)
 	{
-		/*
-		int size = attr -> var -> size;
-
-		struct IRCode	*code = Build_IRCode(DEC, Build_Operand(VARIABLE, no, NULL), NULL, NULL, 0, size);
-
-		struct IRChain	*ret = IRChain_build(code);
-		*/
-		// to be continued...	
+		struct Operand	*new = Build_Operand(VARIABLE, no);
+		return IRChain_build(Build_IRCode(ASSIGN, new, value, NULL, 0, 0, NULL));
 	}
-	return NULL;
+	else
+		return NULL;
 }
 
-struct IRChain *IR_VarDec_B(void *root)
+struct IRChain *IR_VarDec_B(void *root, struct Operand *value)
 {
 	return NULL;
 	// to be continued...
-	struct VarDec_B		*ptr = (struct VarDec_B *)root;
+	//struct VarDec_B		*ptr = (struct VarDec_B *)root;
 }
 
 
@@ -682,6 +699,8 @@ struct IRChain *IR_Exp(struct Exp *root, struct Operand *place)
 		return (root -> IR(root -> next, place));	
 	else	// @@@@
 	{
+		if (place == NULL) return NULL;
+
 		int l1 = get_label();
 		int l2 = get_label();
 
@@ -702,9 +721,11 @@ struct IRChain *IR_Exp(struct Exp *root, struct Operand *place)
 
 struct IRChain *IR_Exp_INT(void *root, struct Operand *place)
 {
+	if (place == NULL) return NULL;
+
 	struct Exp_INT	*ptr = (struct Exp_INT *)root;
 
-	struct Operand	*value = Build_Operand(CONSTANT, ptr -> key, NULL);
+	struct Operand	*value = Build_Operand(CONSTANT, ptr -> key);
 	struct IRChain	*code = IRChain_build(Build_IRCode(ASSIGN, place, value, NULL, 0, 0, NULL));
 
 	return code;
@@ -712,6 +733,8 @@ struct IRChain *IR_Exp_INT(void *root, struct Operand *place)
 
 struct IRChain *IR_Exp_ID(void *root, struct Operand *place)
 {
+	if (place == NULL) return NULL;
+
 	struct Exp_Variable	*ptr = (struct Exp_Variable *)root;
 
 	struct Operand	*var = ID_Operand(ptr -> var -> name);
@@ -725,7 +748,7 @@ struct IRChain *IR_Exp_Assign(void *root, struct Operand *place)
 {
 	struct Exp_Assign		*ptr = (struct Exp_Assign *)root;
 
-	struct Operand	*t1 = Build_Operand(TEMP, get_temp(), NULL);
+	struct Operand	*t1 = Build_Operand(TEMP, get_temp());
 
 	struct Exp_Variable		*L = (struct Exp_Variable *)(ptr -> exp_left -> next); // @@@@@
 	struct Operand	*var = ID_Operand(L -> var -> name);
@@ -745,9 +768,11 @@ struct IRChain *IR_Exp_Assign(void *root, struct Operand *place)
 
 struct IRChain *IR_Exp_Minus(void *root, struct Operand *place)
 {
+	if (place == NULL) return NULL;
+
 	struct Exp_Unary	*ptr = (struct Exp_Unary *)root;
 
-	struct Operand	*t1 = Build_Operand(TEMP, get_temp(), NULL);
+	struct Operand	*t1 = Build_Operand(TEMP, get_temp());
 
 	struct IRChain	*codeA = IR_Exp(ptr -> exp, t1);
 	struct IRChain	*codeB = IRChain_build(Build_IRCode(SUB, place, Zero, t1, 0, 0, NULL));
@@ -755,12 +780,25 @@ struct IRChain *IR_Exp_Minus(void *root, struct Operand *place)
 	return IRChain_link(codeA, codeB);
 }
 
+struct IRChain *IR_Exp_Par(void *root, struct Operand *place)
+{
+	if (place == NULL) return NULL;
+
+	struct Exp_Unary	*ptr = (struct Exp_Unary *)root;
+
+	struct IRChain	*code = IR_Exp(ptr -> exp, place);
+
+	return code;
+}
+
 struct IRChain *IR_Exp_ADD_SUB_MUL_DIV(void *root, struct Operand *place)
 {
+	if (place == NULL) return NULL;
+
 	struct Exp_Binary_Cal	*ptr = (struct Exp_Binary_Cal *)root;
 
-	struct Operand	*t1 = Build_Operand(TEMP, get_temp(), NULL);
-	struct Operand	*t2 = Build_Operand(TEMP, get_temp(), NULL);
+	struct Operand	*t1 = Build_Operand(TEMP, get_temp());
+	struct Operand	*t2 = Build_Operand(TEMP, get_temp());
 
 	struct IRChain	*codeA = IR_Exp(ptr -> exp_a, t1);
 	struct IRChain	*codeB = IR_Exp(ptr -> exp_b, t2);
@@ -784,3 +822,82 @@ struct IRChain *IR_Exp_ADD_SUB_MUL_DIV(void *root, struct Operand *place)
 	return codeA;
 }
 
+
+struct IRChain *IR_Exp_Function(void *root, struct Operand *place)
+{
+	struct Exp_Function		*ptr = (struct Exp_Function *)root;
+
+	if (ptr -> args == NULL)
+	{
+		if (strcmp(ptr -> func -> name, "read") == 0)
+		{
+			if (place == NULL)
+			{
+				fprintf(stderr, "READ to void\n");
+				return NULL;
+			}
+			return IRChain_build(Build_IRCode(READ, place, NULL, NULL, 0, 0, NULL));
+		}
+		if (place == NULL)
+		{
+			struct Operand	*t = Build_Operand(TEMP, get_temp());
+			return IRChain_build(Build_IRCode(CALL, t, NULL, NULL, 0, 0, ptr -> func -> name));
+		}
+		else
+			return IRChain_build(Build_IRCode(CALL, place, NULL, NULL, 0, 0, ptr -> func -> name));
+	}
+	else
+	{
+		struct ArgsChain	*list = NULL;
+
+		struct IRChain *codeA = IR_Args(ptr -> args, &list);
+
+		if (strcmp(ptr -> func -> name, "write") == 0)
+		{
+			struct IRChain *codeB = IRChain_build(Build_IRCode(WRITE, list -> arg, NULL, NULL, 0, 0, NULL));
+			codeA = IRChain_link(codeA, codeB);
+			if (place != NULL)
+			{
+				struct IRChain *codeC = IRChain_build(Build_IRCode(ASSIGN, place, Zero, NULL, 0, 0, NULL));
+				codeA = IRChain_link(codeA, codeC);
+			}
+			return codeA;
+		}
+		//if (list == NULL) fprintf(stderr, "Fuck!\n");
+		while (list)
+		{
+			struct IRChain *codeB = IRChain_build(Build_IRCode(ARG, list -> arg, NULL, NULL, 0, 0, NULL));
+			codeA = IRChain_link(codeA, codeB);
+			list = list -> next;
+		}
+		struct IRChain *codeB;
+		if (place == NULL)
+		{
+			struct Operand	*t = Build_Operand(TEMP, get_temp());
+			codeB = IRChain_build(Build_IRCode(CALL, t, NULL, NULL, 0, 0, ptr -> func -> name));
+		}
+		else
+			codeB = IRChain_build(Build_IRCode(CALL, place, NULL, NULL, 0, 0, ptr -> func -> name));
+		return IRChain_link(codeA, codeB);
+	}
+}
+
+
+struct IRChain *IR_Args(struct Args *root, struct ArgsChain **list)
+{
+	struct IRChain	*ret = NULL;
+	while (root)
+	{
+		struct Operand	*t = Build_Operand(TEMP, get_temp());
+		struct IRChain	*code = IR_Exp(root -> exp, t);
+
+		struct ArgsChain	*new = (struct ArgsChain *)malloc(sizeof(struct ArgsChain));
+		new -> arg = t;
+		new -> next = *list;
+		*list = new;
+
+		ret = IRChain_link(ret, code);
+		root = root -> args;
+	}
+	return ret;
+}

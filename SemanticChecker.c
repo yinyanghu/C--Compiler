@@ -51,11 +51,11 @@ void Build_TYPE_Basic(void)
 }
 
 // YES
-struct Argument	*Build_Argument(/* char *name, */struct TYPE *type, struct Argument *next)
+struct Argument	*Build_Argument(char *name, struct TYPE *type, struct Argument *next)
 {
 	struct Argument	*ptr = (struct Argument *)malloc(sizeof(struct Argument));
 
-	//strcpy(ptr -> name, name);
+	strcpy(ptr -> name, name);
 	ptr -> type = type;
 	ptr -> next = next;
 
@@ -244,7 +244,7 @@ void SemanticAnalysis(struct Program *AST)
 
 	SemanticCheck_Program(AST);
 
-	IRST_test(IRST);
+	//IRST_test(IRST);
 
 	/*
 	fprintf(stderr, "=================================\n");
@@ -272,7 +272,7 @@ void SemanticCheck_Program(struct Program *root)
 
 	struct IRSymbolsTable *IRwrite = IRST_insert(IRST, "write");
 	struct SymbolsTable	*write = ST_insert(ST, "write", &Scope);
-	struct Attribute *write_attr = Build_Attribute(Function, Build_FunctionAttribute(basic_int, Build_Argument(basic_int, NULL), 0, 0, Defined), NULL, NULL);
+	struct Attribute *write_attr = Build_Attribute(Function, Build_FunctionAttribute(basic_int, Build_Argument("", basic_int, NULL), 0, 0, Defined), NULL, NULL);
 	IRwrite -> attr = write -> attr = write_attr;
 
 	SemanticCheck_ExtDefList(root -> extdeflist);
@@ -582,7 +582,7 @@ struct Argument	*SemanticCheck_Argument_VarDec_A(void *root, struct TYPE *type)
 	struct IRSymbolsTable *IRnew = IRST_insert(IRST, ptr -> id -> name);
 	IRnew -> attr = new -> attr;		// <---- Bug?
 
-	return Build_Argument(/* ptr -> id -> name, */type, NULL);
+	return Build_Argument(ptr -> id -> name, type, NULL);
 }
 
 // NO

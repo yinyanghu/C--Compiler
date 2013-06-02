@@ -1,13 +1,17 @@
-int main()
+int gcd(int x, int y)
 {
-	int a, b;
-	int A, B, C, D;
-	a = 8;
-	b = 4;
-	A = a + b;
-	B = a - b;
-	C = a * b;
-	D = a / b;
-	return A + B + C + D;
+	if (y == 0)
+		return x;
+	else
+		return gcd(y, x - y * (x / y));
 }
 
+int main()
+{
+	int a = read();
+	int b = read();
+	int c;
+	c = gcd(a, b);
+	write(c);
+	return 0;
+}

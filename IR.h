@@ -7,7 +7,7 @@ int	get_label(void);
 int get_var(struct VariableAttribute *);
 struct Operand	*ID_Operand(char *);
 
-struct Operand	*Build_Operand(OperandType, int, char *);
+struct Operand	*Build_Operand(OperandType, int);
 struct IRCode	*Build_IRCode(IRCodeType, struct Operand *, struct Operand *, struct Operand *, BinaryOP_Relop, int, char *);
 
 
@@ -43,9 +43,9 @@ struct IRChain *IR_Stmt_While(void *);
 struct IRChain *IR_Def(struct Def *);
 struct IRChain *IR_DecList(struct DecList *);
 struct IRChain *IR_Dec(struct Dec *);
-struct IRChain *IR_VarDec(struct VarDec *);
-struct IRChain *IR_VarDec_A(void *);
-struct IRChain *IR_VarDec_B(void *);
+struct IRChain *IR_VarDec(struct VarDec *, struct Operand *);
+struct IRChain *IR_VarDec_A(void *, struct Operand *);
+struct IRChain *IR_VarDec_B(void *, struct Operand *);
 
 
 struct IRChain *IR_Condition(struct Exp *, int, int);
@@ -53,6 +53,7 @@ struct IRChain *IR_Condition_RELOP(void *, int, int);
 struct IRChain *IR_Condition_NOT(void *, int, int);
 struct IRChain *IR_Condition_AND(void *, int, int);
 struct IRChain *IR_Condition_OR(void *, int, int);
+struct IRChain *IR_Condition_Par(void *, int, int);
 
 
 struct IRChain *IR_Exp(struct Exp *, struct Operand *);
@@ -61,5 +62,9 @@ struct IRChain *IR_Exp_ID(void *, struct Operand *);
 struct IRChain *IR_Exp_Assign(void *, struct Operand *);
 struct IRChain *IR_Exp_Minus(void *, struct Operand *);
 struct IRChain *IR_Exp_ADD_SUB_MUL_DIV(void *, struct Operand *);
+struct IRChain *IR_Exp_Par(void *, struct Operand *);
+
+struct IRChain *IR_Exp_Function(void *, struct Operand *);
+struct IRChain *IR_Args(struct Args *, struct ArgsChain **);
 
 #endif

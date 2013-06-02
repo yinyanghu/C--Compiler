@@ -85,13 +85,30 @@ id				{letter}+({letter}|{digit})*
 					return ASSIGNOP;
 				}
 
-{relop}			{
-					//printf("RELOP\n");
-					
-					/* to fix the bug */
+"=="			{
+					yylval.relop = OP_EQ;
 					return RELOP;
 				}
-
+"!="			{
+					yylval.relop = OP_NE;
+					return RELOP;
+				}
+"<"				{
+					yylval.relop = OP_LT;
+					return RELOP;
+				}
+">"				{
+					yylval.relop = OP_GT;
+					return RELOP;
+				}
+"<="			{
+					yylval.relop = OP_LE;
+					return RELOP;
+				}
+">="			{
+					yylval.relop = OP_GE;
+					return RELOP;
+				}
 "+"				{
 					//printf("PLUS\n");
 					return PLUS;

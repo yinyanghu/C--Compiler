@@ -33,7 +33,7 @@ struct TYPE {
 
 struct Argument {
 	struct TYPE			*type;
-	//char				name[NameSize];
+	char				name[NameSize];
 	struct Argument		*next;
 };
 
@@ -144,6 +144,11 @@ struct IRCode {
 struct IRChain {
 	struct IRCode	*code;
 	struct IRChain	*prev, *next;
+};
+
+struct ArgsChain {
+	struct Operand		*arg;
+	struct ArgsChain	*next;
 };
 
 //================================================
@@ -280,7 +285,7 @@ struct VarDec {
 
 	struct Argument			*(*SemanticArgumentCheck)(void *, struct TYPE *);
 
-	struct IRChain			*(*IR)(void *);
+	struct IRChain			*(*IR)(void *, struct Operand *);
 };
 
 struct VarDec_A {
