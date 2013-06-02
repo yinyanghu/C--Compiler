@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "cmm.h"
 
+extern	int ErrorCounter;
+
 int		LabelCounter;
 int		VarCounter;
 int		TempCounter;
@@ -10,6 +12,42 @@ int		TempCounter;
 struct IRChain		*IR;
 
 struct Operand		*Zero, *One;
+
+int isbasic(struct TYPE *ptr)
+{
+	return ((ptr -> level == Basic) ? 1 : -1);
+}
+
+int typesize(struct TYPE *ptr)
+{
+	if (ptr -> level == Basic)
+		return 4;
+	else if (ptr -> level == Array)
+		return ((ptr -> array -> size) * typesize(ptr -> array -> next));
+	else if (ptr -> level == Structure)
+	{
+		int ret = 0;
+		struct StructureType *x = ptr -> structure;	
+		while (x)
+		{
+			x = x -> next;	
+			ret += typesize(x -> type);
+		}
+		return ret;
+	}
+}
+
+int offset(struct StructureType *ptr, char *name)
+{
+	int ret = 0;
+	while (ptr)
+	{
+		if (strcmp(name, ptr -> name) == 0) 
+			return ret;
+		ret += typesize(ptr -> type);
+		ptr = ptr -> next;
+	}
+}
 
 int	get_label(void)
 {
@@ -25,8 +63,10 @@ int get_temp(void)
 
 int get_var(struct VariableAttribute *attr)
 {
+	/*
 	if (attr -> type -> level != Basic)
 		return -1;
+	*/
 
 	if (attr -> no == -1)
 	{
@@ -359,7 +399,6 @@ struct IRChain *IR_ExtDef_A(void *root)
 
 struct IRChain *IR_ExtDef_B(void *root)
 {
-	// @@@
 	return NULL;
 }
 
@@ -678,18 +717,28 @@ struct IRChain *IR_VarDec_A(void *root, struct Operand *value)
 
 	if (value != NULL)
 	{
+		if (isbasic(attr -> var -> type) == -1)
+		{
+			++ ErrorCounter;
+			fprintf(stderr, "Can not translate the code: initialize a struct or array variable.\n");
+			return NULL;
+		}
 		struct Operand	*new = Build_Operand(VARIABLE, no);
 		return IRChain_build(Build_IRCode(ASSIGN, new, value, NULL, 0, 0, NULL));
 	}
-	else
-		return NULL;
+	else if (isbasic(attr -> var -> type) == -1)
+	{
+		// structure or array
+		int size = typesize(attr -> var -> type);
+		struct Operand	*new = Build_Operand(VARIABLE, no);
+		return IRChain_build(Build_IRCode(DEC, new, NULL, NULL, 0, size, NULL));
+	}
 }
 
 struct IRChain *IR_VarDec_B(void *root, struct Operand *value)
 {
-	return NULL;
-	// to be continued...
-	//struct VarDec_B		*ptr = (struct VarDec_B *)root;
+	struct VarDec_B		*ptr = (struct VarDec_B *)root;
+	return IR_VarDec(ptr -> vardec, value);
 }
 
 

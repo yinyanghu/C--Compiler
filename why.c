@@ -1,14 +1,11 @@
-/*
 struct AA
 {
 	int a;
 	int b;
 };
-*/
 
 int main()
 {
-	//struct AA	x;
-	int A[10];
-	return 0;
+	struct AA p = 0;
 }
+
