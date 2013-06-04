@@ -901,7 +901,8 @@ struct StructureType *SemanticCheck_Structure_Dec(struct Dec *root, struct TYPE 
 struct TYPE *SemanticCheck_Exp(struct Exp *root)
 {
 	errorline = TreeNode_GetLineno(&(root -> tree));
-	return (root -> SemanticCheck(root -> next));
+	root -> exp_type = root -> SemanticCheck(root -> next);
+	return (root -> exp_type);
 }
 
 

@@ -39,7 +39,7 @@ struct DefList				*Build_DefList(struct Def *, struct DefList *, int);
 struct Def					*Build_Def(struct Specifier *, struct DecList *, int);
 struct DecList				*Build_DecList(struct Dec *, struct DecList *, int);
 struct Dec					*Build_Dec(struct VarDec *, struct Exp *, int);
-struct Exp					*Build_Exp(void *, int, void (*)(void *),struct TYPE *(*)(void *), struct IRChain *(*)(void *, struct Operand *), struct IRChain *(*)(void *, int, int), int);
+struct Exp					*Build_Exp(void *, int, void (*)(void *),struct TYPE *(*)(void *), struct IRChain *(*)(void *, struct Operand *, struct TYPE *), struct IRChain *(*)(void *, int, int), int);
 struct Exp_Assign			*Build_Exp_Assign(struct Exp *, struct Exp *);
 struct Exp_Binary_Rel		*Build_Exp_Binary_Rel(struct Exp *, struct Exp *, BinaryOP_Relop);
 struct Exp_Binary_Cal		*Build_Exp_Binary_Cal(struct Exp *, struct Exp *, BinaryOP_Calop);

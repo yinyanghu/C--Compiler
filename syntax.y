@@ -451,11 +451,11 @@ Exp					:	Exp ASSIGNOP Exp
 						}
 					|	Exp LB Exp RB
 						{
-							$$ = Build_Exp((void *)Build_Exp_Array($1, $3), 1, &Visit_Exp_Array, &SemanticCheck_Exp_Array, NULL, NULL, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Array($1, $3), 1, &Visit_Exp_Array, &SemanticCheck_Exp_Array, &IR_Exp_Array, NULL, @$.first_line);
 						}
 					|	Exp DOT ID
 						{
-							$$ = Build_Exp((void *)Build_Exp_Attribute($1, Build_ID($3)), 1, &Visit_Exp_Attribute, &SemanticCheck_Exp_Attribute, NULL, NULL, @$.first_line);
+							$$ = Build_Exp((void *)Build_Exp_Attribute($1, Build_ID($3)), 1, &Visit_Exp_Attribute, &SemanticCheck_Exp_Attribute, &IR_Exp_Attribute, NULL, @$.first_line);
 						}
 					|	ID
 						{

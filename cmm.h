@@ -61,6 +61,7 @@ struct VariableAttribute {
 	unsigned int	address;
 	int				size;
 	int				no;
+	int				is_ptr;
 };
 
 // For IR Code
@@ -416,11 +417,13 @@ struct Exp {
 
 	void	*next;
 
+	struct TYPE			*exp_type;
+
 	void	(*Visit)(void *);
 
 	struct TYPE		*(*SemanticCheck)(void *);
 	
-	struct IRChain	*(*IR)(void *, struct Operand *);
+	struct IRChain	*(*IR)(void *, struct Operand *, struct TYPE *);
 
 	struct IRChain	*(*IR_Condition)(void *, int, int);
 };
