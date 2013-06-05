@@ -152,6 +152,17 @@ struct ArgsChain {
 	struct ArgsChain	*next;
 };
 
+
+//====================================================
+
+
+struct CodeBlock {
+	struct IRChain		*code;	
+	struct CodeBlock	*nextA, *nextB;
+};
+
+
+
 //================================================
 
 
@@ -423,7 +434,7 @@ struct Exp {
 
 	struct TYPE		*(*SemanticCheck)(void *);
 	
-	struct IRChain	*(*IR)(void *, struct Operand *, struct TYPE *);
+	struct IRChain	*(*IR)(void *, struct Operand *, struct TYPE *, int);
 
 	struct IRChain	*(*IR_Condition)(void *, int, int);
 };
@@ -485,7 +496,6 @@ struct Args {
 struct ID {
 	char	name[NameSize];
 };
-
 
 //====================================================
 

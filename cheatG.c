@@ -2,6 +2,7 @@ int main()
 {
 	int w[11], v[11], i, j = 1, maxW = 50;
 	int f[11][51];
+	int p;
 	i = 0;
 	while (i < 10)
 	{
@@ -19,7 +20,15 @@ int main()
 		while (j <= 50)
 		{
 			f[i][j] = f[i-1][j];
-			if (j >= w[i]) if (f[i-1][j-w[i]]+v[i] > f[i][j]) f[i][j] = f[i-1][j-w[i]] + v[i];
+			/*
+			p = j - w[i];
+			if (p >= 0)	
+				if (f[i - 1][p] + v[i] > f[i][j])
+					f[i][j] = f[i - 1][p] + v[i];
+					*/
+			if (j >= w[i])
+				if (f[i-1][j-w[i]]+v[i] > f[i][j])
+					f[i][j] = f[i-1][j-w[i]] + v[i];
 			j = j + 1;
 		}
 		i = i + 1;

@@ -7,7 +7,7 @@
 #define PURPLE	"\E[1;35m"
 #define NORMAL	"\E[m"
 
-#define NameSize	20
+#define NameSize	40
 //#define GLOBAL_COLOR
 
 typedef enum {

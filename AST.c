@@ -407,7 +407,7 @@ struct Dec *Build_Dec(struct VarDec *child_A, struct Exp *child_B, int lineno)
 	return ptr;
 }
 
-struct Exp *Build_Exp(void *child, int LV, void (*func_visit)(void *), struct TYPE *(*func_sc)(void *), struct IRChain *(*func_ir)(void *, struct Operand *, struct TYPE *), struct IRChain *(*func_irc)(void *, int, int), int lineno)
+struct Exp *Build_Exp(void *child, int LV, void (*func_visit)(void *), struct TYPE *(*func_sc)(void *), struct IRChain *(*func_ir)(void *, struct Operand *, struct TYPE *, int), struct IRChain *(*func_irc)(void *, int, int), int lineno)
 {
 	struct Exp		*ptr = (struct Exp *)malloc(sizeof(struct Exp));
 

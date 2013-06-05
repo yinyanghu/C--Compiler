@@ -56,17 +56,17 @@ struct IRChain *IR_Condition_OR(void *, int, int);
 struct IRChain *IR_Condition_Par(void *, int, int);
 
 
-struct IRChain *IR_Exp(struct Exp *, struct Operand *);
-struct IRChain *IR_Exp_INT(void *, struct Operand *, struct TYPE *);
-struct IRChain *IR_Exp_ID(void *, struct Operand *, struct TYPE *);
-struct IRChain *IR_Exp_Assign(void *, struct Operand *, struct TYPE *);
-struct IRChain *IR_Exp_Minus(void *, struct Operand *, struct TYPE *);
-struct IRChain *IR_Exp_ADD_SUB_MUL_DIV(void *, struct Operand *, struct TYPE *);
-struct IRChain *IR_Exp_Par(void *, struct Operand *, struct TYPE *);
-struct IRChain *IR_Exp_Attribute(void *, struct Operand *, struct TYPE *);
-struct IRChain *IR_Exp_Array(void *, struct Operand *, struct TYPE *);
+struct IRChain *IR_Exp(struct Exp *, struct Operand *, int);
+struct IRChain *IR_Exp_INT(void *, struct Operand *, struct TYPE *, int);
+struct IRChain *IR_Exp_ID(void *, struct Operand *, struct TYPE *, int);
+struct IRChain *IR_Exp_Assign(void *, struct Operand *, struct TYPE *, int);
+struct IRChain *IR_Exp_Minus(void *, struct Operand *, struct TYPE *, int);
+struct IRChain *IR_Exp_ADD_SUB_MUL_DIV(void *, struct Operand *, struct TYPE *, int);
+struct IRChain *IR_Exp_Par(void *, struct Operand *, struct TYPE *, int);
+struct IRChain *IR_Exp_Attribute(void *, struct Operand *, struct TYPE *, int);
+struct IRChain *IR_Exp_Array(void *, struct Operand *, struct TYPE *, int);
 
-struct IRChain *IR_Exp_Function(void *, struct Operand *, struct TYPE *);
+struct IRChain *IR_Exp_Function(void *, struct Operand *, struct TYPE *, int);
 
 
 struct IRChain *IR_Args(struct Args *, struct ArgsChain **);
