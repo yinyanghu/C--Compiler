@@ -17,9 +17,9 @@ int main(int argc, char **argv)
 {
 	/*yydebug = 1;*/
 
-	if (argc != 2)
+	if (argc != 3 && argc != 2)
 	{
-		fprintf(stderr, "cmm: fatal error: No input files or Not only one input files\n");
+		fprintf(stderr, "cmm: fatal error: Input error\n");
 		return -1;
 	}
 
@@ -51,7 +51,15 @@ int main(int argc, char **argv)
 
 	if (ErrorCounter != 0) return 0;
 
-	GeneratingIR(AST);
+	FILE *ir_file = fopen(argv[2], "w");
+
+	if (!ir_file)
+	{
+		fprintf(stderr, "cmm: fatal error: IR code file error\n"); 
+		return -1;
+	}
+
+	GeneratingIR(AST, ir_file);
 
 	return 0;
 }

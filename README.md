@@ -8,9 +8,23 @@ A simplified C Compiler
 * [x] Lexical Analyser
 * [x] Syntax Analyser
 * [x] Semantic Analyser
-
+* [x] Generate IR Code
 
 ## Timeline
+
+* June 4, 2013
+
+> Generating IR Code: Debug, Test(Con't)
+
+* June 3, 2013
+
+> Generating IR Code: Debug, Test
+
+> Generating IR Code: Structure and Array
+
+* June 1, 2013
+
+> Generating IR Code: Basic Framework
 
 * April 28, 2013:
 

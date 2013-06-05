@@ -3,21 +3,30 @@
 
 extern struct IRChain		*IR;
 
+int isbasic(struct TYPE *);
+int typesize(struct TYPE *);
+int attr_offset(struct StructureType *, char *);
+
 int	get_label(void);
+int get_temp(void);
 int get_var(struct VariableAttribute *);
 struct Operand	*ID_Operand(char *, int);
 
 struct Operand	*Build_Operand(OperandType, int);
 struct IRCode	*Build_IRCode(IRCodeType, struct Operand *, struct Operand *, struct Operand *, BinaryOP_Relop, int, char *);
 
+void Print_Operand(struct Operand *, FILE *);
+char *Print_RELOP(BinaryOP_Relop);
+void Print_IRCode(struct IRCode *, FILE *);
+
 
 struct IRChain *IRChain_build(struct IRCode *);
 struct IRChain *IRChain_link(struct IRChain *, struct IRChain *);
-void Print_IRChain(struct IRChain *);
+void Print_IRChain(struct IRChain *, FILE *);
 
 
 
-void GeneratingIR(struct Program *);
+void GeneratingIR(struct Program *, FILE *);
 struct IRChain *IR_Program(struct Program *);
 struct IRChain *IR_ExtDefList(struct ExtDefList *);
 struct IRChain *IR_ExtDef(struct ExtDef *);

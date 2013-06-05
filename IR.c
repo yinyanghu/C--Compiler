@@ -188,16 +188,16 @@ struct IRCode	*Build_IRCode(IRCodeType type, struct Operand *A, struct Operand *
 }
 
 
-void Print_Operand(struct Operand *ptr)
+void Print_Operand(struct Operand *ptr, FILE *file)
 {
 	if (ptr -> type == VARIABLE)
-		fprintf(stdout, "v%d", ptr -> var_no);
+		fprintf(file, "v%d", ptr -> var_no);
 	else if (ptr -> type == TEMP)
-		fprintf(stdout, "t%d", ptr -> temp_no);
+		fprintf(file, "t%d", ptr -> temp_no);
 	else if (ptr -> type == CONSTANT)
-		fprintf(stdout, "#%d", ptr -> constant);
+		fprintf(file, "#%d", ptr -> constant);
 	else
-		fprintf(stdout, "%u", ptr -> addr);
+		fprintf(file, "%u", ptr -> addr);
 }
 
 char *Print_RELOP(BinaryOP_Relop op)
@@ -218,119 +218,119 @@ char *Print_RELOP(BinaryOP_Relop op)
 		return "Fuck 007";
 }
 
-void Print_IRCode(struct IRCode *ptr)
+void Print_IRCode(struct IRCode *ptr, FILE *file)
 {
 	IRCodeType type = ptr -> type;
 
 	if (type == LABEL)
-		fprintf(stdout, "LABEL L%d :", ptr -> label);
+		fprintf(file, "LABEL L%d :", ptr -> label);
 	else if (type == FUNCTION)
-		fprintf(stdout, "FUNCTION %s :", ptr -> func);
+		fprintf(file, "FUNCTION %s :", ptr -> func);
 	else if (type == GOTO)
-		fprintf(stdout, "GOTO L%d", ptr -> label);
+		fprintf(file, "GOTO L%d", ptr -> label);
 	else if (type == ARG)
 	{
-		fprintf(stdout, "ARG ");
-		Print_Operand(ptr -> single);
+		fprintf(file, "ARG ");
+		Print_Operand(ptr -> single, file);
 	}
 	else if (type == PARAM)
 	{
-		fprintf(stdout, "PARAM ");
-		Print_Operand(ptr -> single);
+		fprintf(file, "PARAM ");
+		Print_Operand(ptr -> single, file);
 	}
 	else if (type == RETURNRETURN)
 	{
-		fprintf(stdout, "RETURN ");
-		Print_Operand(ptr -> single);
+		fprintf(file, "RETURN ");
+		Print_Operand(ptr -> single, file);
 	}
 	else if (type == READ)
 	{
-		fprintf(stdout, "READ ");
-		Print_Operand(ptr -> single);
+		fprintf(file, "READ ");
+		Print_Operand(ptr -> single, file);
 	}
 	else if (type == WRITE)
 	{
-		fprintf(stdout, "WRITE ");
-		Print_Operand(ptr -> single);
+		fprintf(file, "WRITE ");
+		Print_Operand(ptr -> single, file);
 	}
 	else if (type == ASSIGN)
 	{
-		Print_Operand(ptr -> lr.left);
-		fprintf(stdout, " := ");
-		Print_Operand(ptr -> lr.right);
+		Print_Operand(ptr -> lr.left, file);
+		fprintf(file, " := ");
+		Print_Operand(ptr -> lr.right, file);
 	}
 	else if (type == CALL)
 	{
-		Print_Operand(ptr -> call.ret);
-		fprintf(stdout, " := CALL %s", ptr -> call.func);
+		Print_Operand(ptr -> call.ret, file);
+		fprintf(file, " := CALL %s", ptr -> call.func);
 	}
 	else if (type == ValueAddress)
 	{
-		Print_Operand(ptr -> lr.left);
-		fprintf(stdout, " := &");
-		Print_Operand(ptr -> lr.right);
+		Print_Operand(ptr -> lr.left, file);
+		fprintf(file, " := &");
+		Print_Operand(ptr -> lr.right, file);
 	}
 	else if (type == AddressValueL)
 	{
-		fprintf(stdout, "*");
-		Print_Operand(ptr -> lr.left);
-		fprintf(stdout, " := ");
-		Print_Operand(ptr -> lr.right);
+		fprintf(file, "*");
+		Print_Operand(ptr -> lr.left, file);
+		fprintf(file, " := ");
+		Print_Operand(ptr -> lr.right, file);
 	}
 	else if (type == AddressValueR)
 	{
-		Print_Operand(ptr -> lr.left);
-		fprintf(stdout, " := *");
-		Print_Operand(ptr -> lr.right);
+		Print_Operand(ptr -> lr.left, file);
+		fprintf(file, " := *");
+		Print_Operand(ptr -> lr.right, file);
 	}
 	else if (type == ADD)
 	{
-		Print_Operand(ptr -> binary.result);	
-		fprintf(stdout, " := ");
-		Print_Operand(ptr -> binary.op1);	
-		fprintf(stdout, " + ");
-		Print_Operand(ptr -> binary.op2);	
+		Print_Operand(ptr -> binary.result, file);	
+		fprintf(file, " := ");
+		Print_Operand(ptr -> binary.op1, file);
+		fprintf(file, " + ");
+		Print_Operand(ptr -> binary.op2, file);
 	}
 	else if (type == SUB)
 	{
-		Print_Operand(ptr -> binary.result);	
-		fprintf(stdout, " := ");
-		Print_Operand(ptr -> binary.op1);	
-		fprintf(stdout, " - ");
-		Print_Operand(ptr -> binary.op2);	
+		Print_Operand(ptr -> binary.result, file);	
+		fprintf(file, " := ");
+		Print_Operand(ptr -> binary.op1, file);	
+		fprintf(file, " - ");
+		Print_Operand(ptr -> binary.op2, file);	
 	}
 	else if (type == MUL)
 	{
-		Print_Operand(ptr -> binary.result);	
-		fprintf(stdout, " := ");
-		Print_Operand(ptr -> binary.op1);	
-		fprintf(stdout, " * ");
-		Print_Operand(ptr -> binary.op2);	
+		Print_Operand(ptr -> binary.result, file);	
+		fprintf(file, " := ");
+		Print_Operand(ptr -> binary.op1, file);	
+		fprintf(file, " * ");
+		Print_Operand(ptr -> binary.op2, file);	
 	}
 	else if (type == DIVDIV)
 	{
-		Print_Operand(ptr -> binary.result);	
-		fprintf(stdout, " := ");
-		Print_Operand(ptr -> binary.op1);	
-		fprintf(stdout, " / ");
-		Print_Operand(ptr -> binary.op2);	
+		Print_Operand(ptr -> binary.result, file);	
+		fprintf(file, " := ");
+		Print_Operand(ptr -> binary.op1, file);	
+		fprintf(file, " / ");
+		Print_Operand(ptr -> binary.op2, file);	
 	}
 	else if (type == CONDGOTO)
 	{
-		fprintf(stdout, "IF ");
-		Print_Operand(ptr -> condjump.left);
-		fprintf(stdout, " %s ", Print_RELOP(ptr -> condjump.op));
-		Print_Operand(ptr -> condjump.right);
-		fprintf(stdout, " GOTO L%d", ptr -> condjump.next);
+		fprintf(file, "IF ");
+		Print_Operand(ptr -> condjump.left, file);
+		fprintf(file, " %s ", Print_RELOP(ptr -> condjump.op));
+		Print_Operand(ptr -> condjump.right, file);
+		fprintf(file, " GOTO L%d", ptr -> condjump.next);
 	}
 	else if (type == DEC)
 	{
-		fprintf(stdout, "DEC ");
-		Print_Operand(ptr -> dec.x);
-		fprintf(stdout, " %d", ptr -> dec.size);
+		fprintf(file, "DEC ");
+		Print_Operand(ptr -> dec.x, file);
+		fprintf(file, " %d", ptr -> dec.size);
 	}
 
-	fprintf(stdout, "\n");
+	fprintf(file, "\n");
 }
 /*
 struct IRChain	*IRChain_clear(void)
@@ -368,12 +368,12 @@ struct IRChain *IRChain_link(struct IRChain *A, struct IRChain *B)
 	return A;
 }
 
-void Print_IRChain(struct IRChain *header)
+void Print_IRChain(struct IRChain *header, FILE *file)
 {
 	struct IRChain	*ptr = header;
 	while (1)
 	{
-		Print_IRCode(ptr -> code);
+		Print_IRCode(ptr -> code, file);
 		ptr = ptr -> next;
 		if (ptr == header) break;
 	}
@@ -382,7 +382,7 @@ void Print_IRChain(struct IRChain *header)
 
 //===============================================================
 
-void GeneratingIR(struct Program *AST)
+void GeneratingIR(struct Program *AST, FILE *file)
 {
 	// Clear Counters
 	TempCounter = LabelCounter = VarCounter = 0;
@@ -396,7 +396,7 @@ void GeneratingIR(struct Program *AST)
 
 	IR = IR_Program(AST);
 
-	Print_IRChain(IR);
+	Print_IRChain(IR, file);
 }
 
 struct IRChain *IR_Program(struct Program *root)
