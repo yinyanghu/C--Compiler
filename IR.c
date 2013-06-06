@@ -5,13 +5,13 @@
 
 extern	int ErrorCounter;
 
+extern struct IRChain		*IR;
+
 int		LabelCounter;
 int		VarCounter;
 int		TempCounter;
 
 //int		Lvalue;
-
-struct IRChain		*IR;
 
 struct Operand		*Zero, *One;
 

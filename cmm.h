@@ -156,9 +156,15 @@ struct ArgsChain {
 //====================================================
 
 
+struct NextBlock {
+	struct CodeBlock	*target;
+	struct NextBlock	*next;
+};
+
 struct CodeBlock {
-	struct IRChain		*code;	
-	struct CodeBlock	*nextA, *nextB;
+	int		label;
+	struct IRChain		*code;
+	struct NextBlock	*out;
 };
 
 
@@ -502,5 +508,6 @@ struct ID {
 #include "AST.h"
 #include "SemanticChecker.h"
 #include "IR.h"
+#include "Optimize.h"
 
 #endif

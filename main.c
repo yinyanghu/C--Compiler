@@ -4,6 +4,8 @@
 
 struct Program		*AST;
 
+struct IRChain		*IR;
+
 int ErrorCounter;
 
 void SyntaxAnalysis(FILE *file)
@@ -60,6 +62,10 @@ int main(int argc, char **argv)
 	}
 
 	GeneratingIR(AST, ir_file);
+
+	fclose(ir_file);
+
+	IR_Optimizer(IR);
 
 	return 0;
 }
