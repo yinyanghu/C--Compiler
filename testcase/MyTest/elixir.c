@@ -1,35 +1,18 @@
-struct aa
+/*
+struct AA
 {
-	int k;
-	int B[10];
-} P;
-
-struct bb
-{
-	int x;
-	int A[10];
-
-} Q;
-
-struct cc {
-	struct dd {
-		int a;
-		int b;
-	} s;
+	int a;
+	int b;
 };
-
-struct dd ss;
-
-int f(int a, int b)
-{
-	P = Q;
-}
-
-int f(int a, int b);
-
-int A[20][230];
-
+*/
 int main()
 {
-	int B[10];
+//	struct AA	x;
+	//int x;
+	int A[10];
+
+	A[0] = 1;
+	A[1] = A[0];
+
+	return 0;
 }

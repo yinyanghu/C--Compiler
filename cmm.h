@@ -224,6 +224,8 @@ struct ExtDef_C {
 	struct Specifier	*specifier;
 	struct FunDec		*fundec;
 	struct CompSt		*compst;
+
+	struct IRChain		*code;
 };
 
 struct ExtDef_D {
@@ -322,6 +324,8 @@ struct FunDec {
 
 	struct ID			*id;
 	struct VarList		*varlist;
+
+	struct IRChain		*code;
 };
 
 
@@ -375,6 +379,8 @@ struct Stmt_Exp {
 
 struct Stmt_CompSt {
 	struct CompSt	*compst;
+
+	struct IRChain		*code;
 };
 
 struct Stmt_Return {

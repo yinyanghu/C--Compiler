@@ -16,9 +16,6 @@ int		DST_Scope;
 
 struct DeclaredFunctionList		*DFL;
 
-// For IR Code
-struct IRSymbolsTable		*IRST[HashingPrime];
-
 
 
 
@@ -316,65 +313,6 @@ void DST_print(struct DynamicStructureTable *dst)
 	}
 
 }
-
-
-// For IR Code
-struct IRSymbolsTable *IRST_insert(struct IRSymbolsTable **List, char *id)
-{
-	struct IRSymbolsTable *ptr = (struct IRSymbolsTable *)malloc(sizeof(struct IRSymbolsTable));
-
-	strcpy(ptr -> name, id);
-	ptr -> attr = NULL;
-
-	int f = StringHashing(id);
-	ptr -> next = List[f] -> next;
-	ptr -> prev = List[f];
-	if (List[f] -> next != NULL)
-		List[f] -> next -> prev = ptr;
-	List[f] -> next = ptr;
-
-	return ptr;
-}
-
-struct IRSymbolsTable *IRST_find(struct IRSymbolsTable **List, char *id)
-{
-	int f = StringHashing(id);
-	struct IRSymbolsTable	*ptr;
-
-	for (ptr = List[f] -> next; ptr != NULL; ptr = ptr -> next)
-		if (strcmp(id, ptr -> name) == 0) return ptr;
-	return NULL;
-}
-
-void IRST_clear(struct IRSymbolsTable **List)
-{
-	int i;
-	for (i = 0; i < HashingPrime; ++ i)
-	{
-		List[i] = (struct IRSymbolsTable *)malloc(sizeof(struct IRSymbolsTable));	//	Just a Head Pointer
-		List[i] -> next = List[i] -> prev = NULL;
-	}
-}
-
-
-/* Just for Fun! */
-void IRST_test(struct IRSymbolsTable **List)
-{
-	int i;
-	struct IRSymbolsTable	*ptr;
-	for (i = 0; i < HashingPrime; ++ i)
-	{
-		for (ptr = List[i] -> next; ptr != NULL; ptr = ptr -> next)
-		{
-			fprintf(stderr, "%s", ptr -> name);
-			if (ptr -> attr == NULL)
-				fprintf(stderr, "<--------------\n");
-			else
-				fprintf(stderr, "\n");
-		}
-	}
-}
-
 
 /*
 

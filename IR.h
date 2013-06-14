@@ -26,6 +26,7 @@ void Print_IRChain(struct IRChain *, FILE *);
 
 
 
+void IR_Initialize(void);
 void GeneratingIR(struct Program *, FILE *);
 struct IRChain *IR_Program(struct Program *);
 struct IRChain *IR_ExtDefList(struct ExtDefList *);

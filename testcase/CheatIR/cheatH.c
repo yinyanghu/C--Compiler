@@ -2,6 +2,7 @@ struct Number
 {
 	int value, index;
 };
+
 int qsort(struct Number a[10], int s, int t)
 {
 	int i = s, j = t, x = a[i].value, y = a[i].index;

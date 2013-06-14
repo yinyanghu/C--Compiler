@@ -240,7 +240,9 @@ void SemanticAnalysis(struct Program *AST)
 	DFL_clear();
 
 	// For IR Code
-	IRST_clear(IRST);
+	//IRST_clear(IRST);
+
+	IR_Initialize();
 
 	SemanticCheck_Program(AST);
 
@@ -264,16 +266,18 @@ void SemanticCheck_Program(struct Program *root)
 	Scope_push(&Scope);
 
 	// Read(), Write()
-	struct IRSymbolsTable *IRread = IRST_insert(IRST, "read");
+	//struct IRSymbolsTable *IRread = IRST_insert(IRST, "read");
 	struct SymbolsTable	*read = ST_insert(ST, "read", &Scope);
 	struct Attribute *read_attr = Build_Attribute(Function, Build_FunctionAttribute(basic_int, NULL, 0, 0, Defined), NULL, NULL);
-	IRread -> attr = read -> attr = read_attr;
+	//IRread -> attr = read -> attr = read_attr;
+	read -> attr = read_attr;
 
 
-	struct IRSymbolsTable *IRwrite = IRST_insert(IRST, "write");
+	//struct IRSymbolsTable *IRwrite = IRST_insert(IRST, "write");
 	struct SymbolsTable	*write = ST_insert(ST, "write", &Scope);
 	struct Attribute *write_attr = Build_Attribute(Function, Build_FunctionAttribute(basic_int, Build_Argument("", basic_int, NULL), 0, 0, Defined), NULL, NULL);
-	IRwrite -> attr = write -> attr = write_attr;
+	//IRwrite -> attr = write -> attr = write_attr;
+	write -> attr = write_attr;
 
 	SemanticCheck_ExtDefList(root -> extdeflist);
 
@@ -332,7 +336,14 @@ void SemanticCheck_ExtDef_C(void *root)
 	}
 
 	if (SemanticCheck_FunDec(ptr -> fundec, return_type, Defined) == 0)
+	{
+		ptr -> fundec -> code = IR_FunDec(ptr -> fundec);
 		SemanticCheck_CompSt(ptr -> compst, return_type);
+	}
+
+	// IR Code
+	ptr -> code = IR_ExtDef_C(root);
+	
 	Scope_pop(&Scope);
 	DST_Global();
 }
@@ -437,8 +448,8 @@ struct StructureType *SemanticCheck_StructSpecifier_A(void *root)
 					DST = DST_insert(DST, name, struct_type);
 					
 					// For IR Code
-					struct IRSymbolsTable *IRnew = IRST_insert(IRST, name);
-					IRnew -> attr = Build_Attribute(Struct, NULL, NULL, Build_StructureAttribute(struct_type, 0));
+					//struct IRSymbolsTable *IRnew = IRST_insert(IRST, name);
+					//IRnew -> attr = Build_Attribute(Struct, NULL, NULL, Build_StructureAttribute(struct_type, 0));
 					
 				}
 				else
@@ -541,8 +552,8 @@ struct SymbolsTable *SemanticCheck_VarDec_A(void *root, struct TYPE *type)
 	new -> attr = Build_Attribute(Variable, NULL, Build_VariableAttribute(type, 0, 0, 0, 0, -1), NULL);	// <-----
 
 	// For IR Code
-	struct IRSymbolsTable *IRnew = IRST_insert(IRST, ptr -> id -> name);
-	IRnew -> attr = new -> attr;		// <---- Bug?
+	//struct IRSymbolsTable *IRnew = IRST_insert(IRST, ptr -> id -> name);
+	//IRnew -> attr = new -> attr;		// <---- Bug?
 
 	return new;
 }
@@ -579,8 +590,8 @@ struct Argument	*SemanticCheck_Argument_VarDec_A(void *root, struct TYPE *type)
 	new -> attr = Build_Attribute(Variable, NULL, Build_VariableAttribute(type, 0, 0, 0, 0, -1), NULL);	// <-----
 
 	// For IR Code
-	struct IRSymbolsTable *IRnew = IRST_insert(IRST, ptr -> id -> name);
-	IRnew -> attr = new -> attr;		// <---- Bug?
+	//struct IRSymbolsTable *IRnew = IRST_insert(IRST, ptr -> id -> name);
+	//IRnew -> attr = new -> attr;		// <---- Bug?
 
 	return Build_Argument(ptr -> id -> name, type, NULL);
 }
@@ -681,8 +692,8 @@ int SemanticCheck_FunDec(struct FunDec *root, struct TYPE *return_type, FuncStat
 	func -> attr = Build_Attribute(Function, Build_FunctionAttribute(return_type, args, 0, 0, status), NULL, NULL); // <------
 
 	// For IR Code
-	struct IRSymbolsTable *IRnew = IRST_insert(IRST, root -> id -> name);
-	IRnew -> attr = func -> attr;		// <---- Bug?
+	//struct IRSymbolsTable *IRnew = IRST_insert(IRST, root -> id -> name);
+	//IRnew -> attr = func -> attr;		// <---- Bug?
 	
 	if (status == Declared)
 	{
@@ -769,6 +780,10 @@ void SemanticCheck_Stmt_CompSt(void *root, struct TYPE *return_type)
 	struct Stmt_CompSt	*ptr = (struct Stmt_CompSt *)root;
 	Scope_push(&Scope);
 	SemanticCheck_CompSt(ptr -> compst, return_type);
+
+	// IR Code
+	ptr -> code = IR_Stmt_CompSt(root);
+
 	Scope_pop(&Scope);
 }
 

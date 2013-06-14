@@ -103,7 +103,7 @@ int get_var(struct VariableAttribute *attr)
 
 struct Operand	*ID_Operand(char *name, int is_ptr)
 {
-	struct Attribute	*attr = IRST_find(IRST, name) -> attr;
+	struct Attribute	*attr = ST_find(ST, name) -> attr;
 
 	if (attr -> type != Variable)
 	{
@@ -382,7 +382,7 @@ void Print_IRChain(struct IRChain *header, FILE *file)
 
 //===============================================================
 
-void GeneratingIR(struct Program *AST, FILE *file)
+void IR_Initialize(void)
 {
 	// Clear Counters
 	TempCounter = LabelCounter = VarCounter = 0;
@@ -393,7 +393,10 @@ void GeneratingIR(struct Program *AST, FILE *file)
 	// Constant #0, #1
 	Zero = Build_Operand(CONSTANT, 0);
 	One = Build_Operand(CONSTANT, 1);
+}
 
+void GeneratingIR(struct Program *AST, FILE *file)
+{
 	IR = IR_Program(AST);
 
 	Print_IRChain(IR, file);
@@ -422,7 +425,7 @@ struct IRChain *IR_ExtDef(struct ExtDef *root)
 
 struct IRChain *IR_ExtDef_A(void *root)
 {
-	fprintf(stderr, "You are a Liar!\n");
+	//fprintf(stderr, "You are a Liar!\n");
 	return NULL;
 }
 
@@ -434,6 +437,8 @@ struct IRChain *IR_ExtDef_B(void *root)
 struct IRChain *IR_ExtDef_C(void *root)
 {
 	struct ExtDef_C		*ptr = (struct ExtDef_C *)root;
+
+	if (ptr -> code != NULL) return (ptr -> code);
 
 	struct IRChain	*fundec = IR_FunDec(ptr -> fundec);
 	struct IRChain	*compst = IR_CompSt(ptr -> compst);
@@ -449,7 +454,9 @@ struct IRChain *IR_ExtDef_D(void *root)
 
 struct IRChain *IR_FunDec(struct FunDec *root)
 {
-	struct Attribute	*attr = IRST_find(IRST, root -> id -> name) -> attr;
+	if (root -> code != NULL) return (root -> code);
+
+	struct Attribute	*attr = ST_find(ST, root -> id -> name) -> attr;
 
 	struct IRCode	*code = Build_IRCode(FUNCTION, NULL, NULL, NULL, 0, 0, root -> id -> name);
 
@@ -532,6 +539,8 @@ struct IRChain *IR_Stmt_Return(void *root)
 struct IRChain *IR_Stmt_CompSt(void *root)
 {
 	struct Stmt_CompSt	*ptr = (struct Stmt_CompSt *)root;
+
+	if (ptr -> code != NULL) return (ptr -> code);
 
 	return IR_CompSt(ptr -> compst);
 	// Bug?
@@ -732,17 +741,19 @@ struct IRChain *IR_VarDec(struct VarDec *root, struct Operand *value)
 struct IRChain *IR_VarDec_A(void *root, struct Operand *value)
 {
 	struct VarDec_A		*ptr = (struct VarDec_A *)root;
-	struct Attribute	*attr = IRST_find(IRST, ptr -> id -> name) -> attr;
+	struct Attribute	*attr = ST_find(ST, ptr -> id -> name) -> attr;
 
 	if (attr -> type != Variable)
 	{
 		fprintf(stderr, "Fuck 005\n");
 	}
 
+	/*
 	if (attr -> var -> no != -1)
 	{
 		fprintf(stderr, "Fuck 002\n");
 	}
+	*/
 
 	int no = get_var(attr -> var);
 
@@ -891,7 +902,7 @@ struct IRChain *IR_Exp_ID(void *root, struct Operand *place, struct TYPE *exp_ty
 
 	struct Exp_Variable	*ptr = (struct Exp_Variable *)root;
 
-	struct Attribute	*attr = IRST_find(IRST, ptr -> var -> name) -> attr;
+	struct Attribute	*attr = ST_find(ST, ptr -> var -> name) -> attr;
 
 	if (attr -> type != Variable)
 	{

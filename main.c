@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 
 	fclose(ir_file);
 
-	IR_Optimizer(IR);
+	//IR_Optimizer(IR);
 
 	return 0;
 }

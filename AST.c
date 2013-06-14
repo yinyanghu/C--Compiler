@@ -82,6 +82,7 @@ struct ExtDef_C *Build_ExtDef_C(struct Specifier *child_A, struct FunDec *child_
 	ptr -> specifier = child_A;
 	ptr -> fundec = child_B;
 	ptr -> compst = child_C;
+	ptr -> code = NULL;
 
 	return ptr;
 }
@@ -240,6 +241,7 @@ struct FunDec *Build_FunDec(struct ID *child_A, struct VarList *child_B, int lin
 	TreeNode_SetLineno(&(ptr -> tree), lineno);
 	ptr -> id = child_A;
 	ptr -> varlist = child_B;
+	ptr -> code = NULL;
 
 	return ptr;
 }
@@ -316,6 +318,7 @@ struct Stmt_CompSt *Build_Stmt_CompSt(struct CompSt *child)
 	struct Stmt_CompSt		*ptr = (struct Stmt_CompSt *)malloc(sizeof(struct Stmt_CompSt));
 
 	ptr -> compst = child;
+	ptr -> code = NULL;
 
 	return ptr;
 }

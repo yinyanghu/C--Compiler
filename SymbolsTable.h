@@ -133,19 +133,4 @@ extern int	DST_Scope;
 extern struct DeclaredFunctionList		*DFL;
 
 
-
-// For IR Code
-struct IRSymbolsTable {
-	char name[NameSize];
-	struct Attribute		*attr;
-	struct IRSymbolsTable	*next, *prev;
-};
-
-struct IRSymbolsTable *IRST_insert(struct IRSymbolsTable **, char *);
-struct IRSymbolsTable *IRST_find(struct IRSymbolsTable **, char *);
-void IRST_clear(struct IRSymbolsTable **);
-void IRST_test(struct IRSymbolsTable **);
-
-extern struct IRSymbolsTable			*IRST[HashingPrime];
-
 #endif
