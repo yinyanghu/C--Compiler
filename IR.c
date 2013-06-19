@@ -169,7 +169,6 @@ struct IRCode	*Build_IRCode(IRCodeType type, struct Operand *A, struct Operand *
 		ptr -> binary.result = A;
 		ptr -> binary.op1 = B;
 		ptr -> binary.op2 = C;
-
 	}
 	else if (type == CONDGOTO)
 	{

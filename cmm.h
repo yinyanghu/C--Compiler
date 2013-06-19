@@ -89,7 +89,7 @@ struct Attribute {
 //================================================
 
 typedef enum {
-		VARIABLE, CONSTANT, ADDRESS, TEMP
+	VARIABLE, CONSTANT, ADDRESS, TEMP
 } OperandType;
 
 typedef enum {
@@ -515,5 +515,6 @@ struct ID {
 #include "SemanticChecker.h"
 #include "IR.h"
 #include "Optimize.h"
+#include "MC.h"
 
 #endif

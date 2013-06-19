@@ -9,8 +9,34 @@ A simplified C Compiler
 * [x] Syntax Analyser
 * [x] Semantic Analyser
 * [x] Generate IR Code
+* [ ] Optimize IR Code
+* [x] Generate Machine Code
 
 ## Timeline
+
+* June 19, 2013
+
+> Generating Machine Code: Function Call, Debug, Test
+
+* June 18, 2013
+
+> Generating Machine Code: Stack Frame
+
+* June 17, 2013
+
+> Generating Machine Code: Basic Framework
+
+* June 15, 2013
+
+> Generating IR Code: Support Scope
+
+* June 7, 2013
+
+> Optimizing IR Code: Build Control Flow Graph
+
+* June 5, 2013
+
+> Lab3 ==> Completed
 
 * June 4, 2013
 

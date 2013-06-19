@@ -16,7 +16,7 @@ int TempSize;
 
 */
 
-#define MaxLabel	2000
+#define MaxLabel	5000
 
 struct CodeBlock	*BlockPool[MaxLabel];
 
@@ -63,12 +63,12 @@ void Update(struct Operand *ptr)
 */
 
 
-inline int Checking_Constant(struct Operand *A)
+int Checking_Constant(struct Operand *A)
 {
 	return ((A -> type == CONSTANT) ? 1 : 0);
 }
 
-inline int Checking_JUMP(struct IRCode *A)
+int Checking_JUMP(struct IRCode *A)
 {
 	if (A -> type == GOTO)
 		return (A -> label);
@@ -78,12 +78,12 @@ inline int Checking_JUMP(struct IRCode *A)
 		return -1;
 }
 
-inline int Checking_Operand(struct Operand *A, struct Operand *B)
+int Checking_Operand(struct Operand *A, struct Operand *B)
 {
 	return ((A -> type == B -> type && A -> var_no == B -> var_no) ? 1 : 0);
 }
 
-inline int Checking_DefaultJUMP(struct IRCode *A)
+int Checking_DefaultJUMP(struct IRCode *A)
 {
 	return ((A -> type == GOTO || A -> type == RETURNRETURN) ? 0 : 1);
 }
@@ -197,7 +197,7 @@ int IR_Optimizer_A(struct IRChain *code)
 
 */
 
-inline int	Get_Label(struct IRChain *ptr)
+inline int Get_Label(struct IRChain *ptr)
 {
 	if (ptr -> code -> type == LABEL)
 		return ptr -> code -> label;
@@ -228,7 +228,7 @@ struct IRChain	*Get_Block(struct IRChain **head)
 }
 
 
-void CFG_print(void)
+void CFG_print(FILE *file)
 {
 	struct NextBlock	*iterator = Candidate;
 	while (iterator)
@@ -236,7 +236,7 @@ void CFG_print(void)
 		struct NextBlock	*ptr = iterator -> target -> out;
 		while (ptr)
 		{
-			fprintf(stderr, "%d -> %d\n", iterator -> target -> label, ptr -> target -> label);
+			fprintf(file, "%d -> %d\n", iterator -> target -> label, ptr -> target -> label);
 			ptr = ptr -> next;
 		}
 		iterator = iterator -> next;
@@ -272,7 +272,7 @@ struct IRChain	*OPT_RETURN(struct IRChain *head)
 	//remove ALL the code following the RETURN instruction in a block
 }
 
-struct IRChain	*OPT_Function(struct IRChain *head)
+struct IRChain	*OPT_Function(struct IRChain *head, FILE *file)
 {
 	// Initialize the Block Pool
 	int i;
@@ -288,8 +288,19 @@ struct IRChain	*OPT_Function(struct IRChain *head)
 
 	while ((ptr = Get_Block(&head)) != NULL)
 	{
-		fprintf(stdout, "==========Block=========\n");
-		Print_IRChain(ptr, stdout);
+
+		/* For Generating Machine Code */
+
+		ptr -> prev -> next = NULL; // Break Code Ring
+
+		GeneratingMC(ptr);
+		
+		ptr -> prev -> next = ptr; // Link Code Ring
+
+		/* For Optimizing IR Code */
+
+		fprintf(file, "==========Block=========\n");
+		Print_IRChain(ptr, file);
 		
 		int label = Get_Label(ptr);
 
@@ -336,7 +347,7 @@ struct IRChain	*OPT_Function(struct IRChain *head)
 	}
 
 	// Test block graph
-	CFG_print();
+	CFG_print(file);
 
 	// Free Candidate
 	iterator = Candidate;
@@ -379,14 +390,14 @@ struct IRChain	*Get_Function(struct IRChain **head)
 	return ret;
 }
 
-struct IRChain	*IR_Optimizer(struct IRChain *code)
+struct IRChain	*IR_Optimizer(struct IRChain *code, FILE *file)
 {
 	struct IRChain	*func_head;
 	while ((func_head = Get_Function(&code)) != NULL)
 	{
-		fprintf(stdout, "==========Function=========\n");
+		fprintf(file, "==========Function=========\n");
 		//Print_IRChain(func_head, stdout);
-		OPT_Function(func_head);
+		OPT_Function(func_head, file);
 	}
 	/*
 	int i;
