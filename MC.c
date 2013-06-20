@@ -22,7 +22,7 @@
 /* Available Registers */
 struct RegisterType		Register[MaxRegister];
 struct RegisterType		FP, SP, V0, V1, RA, A0;
-int		RegisterSaved;
+//int		RegisterSaved;
 
 
 struct IRChain	*pc = NULL;
@@ -242,7 +242,6 @@ void Register_spill(struct RegisterType *reg)
 			offset = Stack_push(reg -> key, 4);
 			MC_SP(-4);
 		}
-
 		MC_Store(reg, -(offset + FPoffset), &FP);
 	}
 
@@ -251,13 +250,13 @@ void Register_spill(struct RegisterType *reg)
 
 void Register_save(void)
 {
-	if (RegisterSaved == 1) return;
+	//if (RegisterSaved == 1) return;
 
 	int i;
 	for (i = 0; i < MaxRegister; ++ i)
 		if (Register[i].key != NULL)
 			Register_spill(Register + i);
-	RegisterSaved = 1;
+	//RegisterSaved = 1;
 }
 
 char *Register_name(struct RegisterType *reg)
@@ -566,7 +565,7 @@ void MC_Dec(struct IRCode *code)
 
 void MC_Arg(struct IRCode *code)
 {
-	if (RegisterSaved == 0)
+	//if (RegisterSaved == 0)
 		Register_save();
 
 	struct RegisterType		*reg = Register_get(code -> single);
@@ -579,7 +578,7 @@ void MC_Arg(struct IRCode *code)
 
 void MC_Call(struct IRCode *code)
 {
-	if (RegisterSaved == 0)
+	//if (RegisterSaved == 0)
 		Register_save();
 
 	fprintf(MC_file, "jal %s", code -> call.func); ENDLINE
@@ -665,8 +664,9 @@ void MC(struct IRCode *code)
 
 void GeneratingMC(struct IRChain *code)		// Block by Block
 {
+	//fprintf(MC_file, "==============================\n");
 	Register_clear();
-	RegisterSaved = 0;
+	//RegisterSaved = 0;
 
 	pc = code;
 	while (pc)
@@ -675,7 +675,7 @@ void GeneratingMC(struct IRChain *code)		// Block by Block
 		//if (pc -> next == code) break;
 		pc = pc -> next;
 	}
-	if (RegisterSaved == 0)
+	//if (RegisterSaved == 0)
 		Register_save();
 }
 
