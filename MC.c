@@ -22,7 +22,6 @@
 /* Available Registers */
 struct RegisterType		Register[MaxRegister];
 struct RegisterType		FP, SP, V0, V1, RA, A0;
-//int		RegisterSaved;
 
 
 struct IRChain	*pc = NULL;
@@ -30,21 +29,24 @@ FILE	*MC_file = NULL;
 
 
 /* Stack Frame */
+/* Static */
 struct StackFrame		Stack[MaxStack];
 int		StackPtr;
 int		StackOffset;
+
+
+/* Dynamic */
 int		CallerArgsOffset;
 
 
 /* Args Frame */
 struct StackFrame		Argument[MaxArg];
 int		ArgPtr;
-//int		CalleeArgsOffset;
 
 
+/* ============= Argument ============== */
 void Arg_clear(void)
 {
-//	CalleeArgsOffset = 0;
 	ArgPtr = 0;
 }
 
@@ -68,10 +70,25 @@ int Arg_offset(struct Operand *var)
 	return -1;
 }
 
+void Arg_build(struct IRChain *head)
+{
+	Arg_clear();
+	while (head)
+	{
+		struct IRCode	*code = head -> code;
+
+		if (code -> type == PARAM)
+			Arg_push(code -> single);
+
+		head = head -> next;
+	}
+}
+
+
+/* ============= Stack ============== */
 void Stack_clear(void)
 {
 	StackPtr = StackOffset = 0;
-	CallerArgsOffset = 0;
 }
 
 int Stack_push(struct Operand *var, int size)
@@ -91,11 +108,64 @@ int Stack_offset(struct Operand *var)
 {
 	int i;
 	for (i = 0; i < StackPtr; ++ i)
-		if (Checking_Operand(Stack[i].key, var) == 1)
+		if (Stack[i].key != NULL && Checking_Operand(Stack[i].key, var) == 1)
 			return (Stack[i].offset);
 	return -1;
 }
 
+void Stack_update(struct Operand *var)
+{
+	if (Checking_Constant(var) == 1) return;
+	if (Arg_offset(var) == -1 && Stack_offset(var) == -1)
+		Stack_push(var, 4);
+}
+
+int Stack_build(struct IRChain *head)
+{
+	Stack_clear();
+	while (head)
+	{
+		struct IRCode	*code = head -> code;
+
+		if (code -> type == ASSIGN || code -> type == AddressValueL || code -> type == AddressValueR)
+		{
+			Stack_update(code -> lr.left);
+			Stack_update(code -> lr.right);
+		}
+		else if (code -> type == ARG || code -> type == READ || code -> type == WRITE || code -> type == RETURNRETURN)
+		{
+			Stack_update(code -> single);
+		}
+		else if (code -> type == CALL)
+		{
+			Stack_update(code -> call.ret);
+		}
+		else if (code -> type == ADD || code -> type == SUB || code -> type == MUL || code -> type == DIVDIV)
+		{
+			Stack_update(code -> binary.result);
+			Stack_update(code -> binary.op1);
+			Stack_update(code -> binary.op2);
+		}
+		else if (code -> type == CONDGOTO)
+		{
+			Stack_update(code -> condjump.left);
+			Stack_update(code -> condjump.right);
+		}
+		else if (code -> type == ValueAddress)
+		{
+			Stack_update(code -> lr.left);
+		}
+		else if (code -> type == DEC)
+		{
+			Stack_push(code -> dec.x, code -> dec.size);
+		}
+		head = head -> next;
+	}
+	return StackOffset;
+}
+
+
+/* ============= Register ============== */
 void Register_special(void)
 {
 	sprintf(FP.name, "$fp");
@@ -108,7 +178,7 @@ void Register_special(void)
 	FP.key = RA.key = SP.key = V1.key = V0.key = A0.key = NULL;
 
 	int i;
-	// Register $t0 ~ $t9
+	/* Register $t0 ~ $t9 */
 	for (i = 0; i <= 9; ++ i)
 	{
 		sprintf(Register[i].name, "$t%d", i);
@@ -116,7 +186,7 @@ void Register_special(void)
 		Register[i].key = NULL;
 	}
 
-	// Register $s0 ~ $s9
+	/* Register $s0 ~ $s9 */
 	for (i = 0; i <= 7; ++ i)
 	{
 		sprintf(Register[i + 10].name, "$s%d", i);
@@ -157,7 +227,7 @@ void Register_update(void)
 			Register_update_operand(code -> lr.left, counter);
 			Register_update_operand(code -> lr.right, counter);
 		}
-		else if (code -> type == ARG || code -> type == PARAM || code -> type == READ || code -> type == WRITE || code -> type == RETURNRETURN)
+		else if (code -> type == ARG || code -> type == READ || code -> type == WRITE || code -> type == RETURNRETURN)
 		{
 			Register_update_operand(code -> single, counter);
 		}
@@ -176,7 +246,11 @@ void Register_update(void)
 			Register_update_operand(code -> condjump.left, counter);
 			Register_update_operand(code -> condjump.right, counter);
 		}
-		// DEC, ValueAddress
+		else if (code -> type == ValueAddress)
+		{
+			Register_update_operand(code -> lr.left, counter);
+		}
+		// DEC, PARAM, LABEL, FUNCTION, GOTO ^_^
 	}
 }
 
@@ -189,6 +263,15 @@ struct RegisterType *Register_allocate(struct Operand *var)
 			Register[i].key = var;
 			return (Register + i);
 		}
+
+	/*
+	for (i = 0; i < MaxRegister; ++ i)
+		if (Checking_Constant(Register[i].key) == 1)
+		{
+			Register[i].key = var;
+			return (Register + i);
+		}
+	*/
 
 	//fprintf(stderr, "!!!!!!!!\n");
 	Register_update();
@@ -207,7 +290,7 @@ struct RegisterType *Register_allocate(struct Operand *var)
 			farthest = Register[i].next_use;
 		}
 
-	//if (farthest != Infinity) // ???
+	//if (farthest != Infinity) // ^_^
 	Register_spill(Register + next);
 
 	Register[next].key = var;
@@ -221,28 +304,20 @@ void Register_free(struct RegisterType *reg)
 	reg -> key = NULL;
 }
 
-void MC_SP(int offset)
-{
-	fprintf(MC_file, "addi $sp, $sp, %d", offset); ENDLINE
-}
-
 void Register_spill(struct RegisterType *reg)
 {
-	//fprintf(stderr, "******\n");
-	int offset = Arg_offset(reg -> key);
-	if (offset != -1)
+	if (Checking_Constant(reg -> key) == 0)
 	{
-		MC_Store(reg, offset, &FP);
-	}
-	else
-	{
-		offset = Stack_offset(reg -> key);
-		if (offset == -1)
+		int offset = Arg_offset(reg -> key);
+		if (offset != -1)
+			MC_Store(reg, offset, &FP);
+		else
 		{
-			offset = Stack_push(reg -> key, 4);
-			MC_SP(-4);
-		}
-		MC_Store(reg, -(offset + FPoffset), &FP);
+			offset = Stack_offset(reg -> key);
+			if (offset == -1)
+				fprintf(stderr, "MC 010!\n");
+			MC_Store(reg, -(offset + FPoffset), &FP);
+		}	
 	}
 
 	Register_free(reg);
@@ -250,13 +325,10 @@ void Register_spill(struct RegisterType *reg)
 
 void Register_save(void)
 {
-	//if (RegisterSaved == 1) return;
-
 	int i;
 	for (i = 0; i < MaxRegister; ++ i)
 		if (Register[i].key != NULL)
 			Register_spill(Register + i);
-	//RegisterSaved = 1;
 }
 
 char *Register_name(struct RegisterType *reg)
@@ -281,20 +353,26 @@ struct RegisterType *Register_get(struct Operand *var)
 	
 	ret = Register_allocate(var);
 
-	int offset = Stack_offset(var);
-
-	if (offset != -1)	// From Local Variable
-		MC_Load(&FP, -(offset + FPoffset), ret);
-	else
+	// Load Variable
+	if (Checking_Constant(var) == 0)
 	{
-		offset = Arg_offset(var);
+		int offset = Arg_offset(var);
 		if (offset != -1)	// From Argument
 			MC_Load(&FP, offset, ret);
+		else
+		{
+			offset = Stack_offset(var);
+			if (offset == -1)	// From Local Variable
+				fprintf(stderr, "MC 013!\n");
+			MC_Load(&FP, -(offset + FPoffset), ret);
+		}
 	}
 
 	return ret;
 }
 
+
+/* ============= Machine Code ============== */
 void MC_Prologue(FILE *file)
 {
 	Register_special();
@@ -344,6 +422,11 @@ void MC_Move(struct RegisterType *src, struct RegisterType *dest)
 	fprintf(MC_file, "move %s, %s", Register_name(dest), Register_name(src)); ENDLINE
 }
 
+void MC_SP(int offset)
+{
+	fprintf(MC_file, "addi $sp, $sp, %d", offset); ENDLINE
+}
+
 void MC_Save_fp(void)
 {
 	MC_SP(-4);
@@ -381,18 +464,20 @@ void MC_Label(struct IRCode *code)
 
 void MC_Function(struct IRCode *code)
 {
+	CallerArgsOffset = 0;
 	Register_clear();
-	Stack_clear();
-	Arg_clear();
 
 	fprintf(MC_file, "%s:", code -> func); ENDLINE
 	MC_Save_fp();
 	MC_Save_ra();
+
+	/* Push all variable into stack */
+	MC_SP(-StackOffset);
 }
 
 void MC_Param(struct IRCode *code)
 {
-	Arg_push(code -> single);
+	/* None */
 }
 
 void MC_Assign(struct IRCode *code)
@@ -496,6 +581,7 @@ void MC_AddressValueL(struct IRCode *code)
 {
 	struct RegisterType		*left = Register_get(code -> lr.left);	
 	struct RegisterType		*right = Register_get(code -> lr.right);	
+
 	MC_Store(right, 0, left);
 }
 
@@ -503,15 +589,18 @@ void MC_AddressValueR(struct IRCode *code)
 {
 	struct RegisterType		*left = Register_get(code -> lr.left);	
 	struct RegisterType		*right = Register_get(code -> lr.right);	
+
 	MC_Load(right, 0, left);
 }
 
 void MC_Return(struct IRCode *code)
 {
 	struct RegisterType		*reg = Register_get(code -> single);
+
 	MC_Move(reg, &V0);
 	Register_save();
 	MC_Restore_fp();
+
 	fprintf(MC_file, "jr %s", Register_name(&RA)); ENDLINE
 }
 
@@ -538,14 +627,18 @@ void MC_CondGoto(struct IRCode *code)
 		fprintf(stderr, "MC 000!\n");
 
 	fprintf(MC_file, "%s, %s, L%d", Register_name(left), Register_name(right), code -> condjump.next); ENDLINE
+
+	Register_free(left);
+	Register_free(right);
 }
 
 void MC_Read(struct IRCode *code)
 {
-	struct RegisterType		*reg = Register_get(code -> single);
 	fprintf(MC_file, "jal read"); ENDLINE
-	MC_Move(&V0, reg);
 	MC_Restore_ra();
+
+	struct RegisterType		*reg = Register_get(code -> single);
+	MC_Move(&V0, reg);
 }
 
 void MC_Write(struct IRCode *code)
@@ -553,20 +646,19 @@ void MC_Write(struct IRCode *code)
 	struct RegisterType		*reg = Register_get(code -> single);
 	MC_Move(reg, &A0);
 	fprintf(MC_file, "jal write"); ENDLINE
+
 	MC_Restore_ra();
 }
 
 
 void MC_Dec(struct IRCode *code)
 {
-	Stack_push(code -> dec.x, code -> dec.size);
-	MC_SP(-(code -> dec.size));
+	/* None */
 }
 
 void MC_Arg(struct IRCode *code)
 {
-	//if (RegisterSaved == 0)
-		Register_save();
+	Register_save();
 
 	struct RegisterType		*reg = Register_get(code -> single);
 
@@ -574,21 +666,21 @@ void MC_Arg(struct IRCode *code)
 
 	MC_SP(-4);	
 	MC_Store(reg, 0, &SP);
+	Register_free(reg);	// ^_^
 }
 
 void MC_Call(struct IRCode *code)
 {
-	//if (RegisterSaved == 0)
-		Register_save();
+	Register_save();
 
 	fprintf(MC_file, "jal %s", code -> call.func); ENDLINE
-	struct RegisterType		*reg = Register_get(code -> call.ret);
-	MC_Move(&V0, reg);
-
 	MC_SP(CallerArgsOffset);
 	CallerArgsOffset = 0;
 
 	MC_Restore_ra();
+
+	struct RegisterType		*reg = Register_get(code -> call.ret);
+	MC_Move(&V0, reg);
 }
 
 void MC(struct IRCode *code)
@@ -661,12 +753,10 @@ void MC(struct IRCode *code)
 		fprintf(stderr, "MC 003!\n");
 }
 
-
 void GeneratingMC(struct IRChain *code)		// Block by Block
 {
 	//fprintf(MC_file, "==============================\n");
 	Register_clear();
-	//RegisterSaved = 0;
 
 	pc = code;
 	while (pc)
@@ -675,7 +765,7 @@ void GeneratingMC(struct IRChain *code)		// Block by Block
 		//if (pc -> next == code) break;
 		pc = pc -> next;
 	}
-	//if (RegisterSaved == 0)
-		Register_save();
+
+	Register_save();
 }
 

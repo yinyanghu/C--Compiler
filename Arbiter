@@ -1,0 +1,96 @@
+#!/bin/bash
+
+echo "==================== StdIR ===================="
+for K in A C D E G H I K L M N O P
+do
+	echo -n "Testing $K: "
+	cp testcase/StdIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	spim -file testcase/out.s > testcase/temp.out
+	sed -i '1,5d' testcase/temp.out
+	diff testcase/StdIR/$K.out testcase/temp.out > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		echo "Accept!"
+	else
+		echo "Wrong Answer!"
+		echo "Standard Output:"
+		cat testcase/StdIR/$K.out
+		echo "Your Output:"
+		cat testcase/temp.out
+	fi
+done
+
+for K in B
+do
+	echo "Testing $K:"
+	cp testcase/StdIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	for T in 1
+	do
+		echo -ne "\tCase $T: "
+		spim -file testcase/out.s < testcase/StdIR/$K.in$T > testcase/temp.out
+		sed -i '1,5d' testcase/temp.out
+		diff testcase/StdIR/$K.out$T testcase/temp.out > /dev/null 2>&1
+		if [ $? -eq 0 ]
+		then
+			echo "Accept!"
+		else
+			echo "Wrong Answer!"
+			echo "Standard Output:"
+			cat testcase/StdIR/$K.out$T
+			echo "Your Output:"
+			cat testcase/temp.out
+		fi
+	done
+done
+
+for K in F
+do
+	echo "Testing $K:"
+	cp testcase/StdIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	for T in 1 2
+	do
+		echo -ne "\tCase $T: "
+		spim -file testcase/out.s < testcase/StdIR/$K.in$T > testcase/temp.out
+		sed -i '1,5d' testcase/temp.out
+		diff testcase/StdIR/$K.out$T testcase/temp.out > /dev/null 2>&1
+		if [ $? -eq 0 ]
+		then
+			echo "Accept!"
+		else
+			echo "Wrong Answer!"
+			echo "Standard Output:"
+			cat testcase/StdIR/$K.out$T
+			echo "Your Output:"
+			cat testcase/temp.out
+		fi
+	done
+done
+
+for K in J
+do
+	echo "Testing $K:"
+	cp testcase/StdIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	for T in 1 2 3
+	do
+		echo -ne "\tCase $T: "
+		spim -file testcase/out.s < testcase/StdIR/$K.in$T > testcase/temp.out
+		sed -i '1,5d' testcase/temp.out
+		diff testcase/StdIR/$K.out$T testcase/temp.out > /dev/null 2>&1
+		if [ $? -eq 0 ]
+		then
+			echo "Accept!"
+		else
+			echo "Wrong Answer!"
+			echo "Standard Output:"
+			cat testcase/StdIR/$K.out$T
+			echo "Your Output:"
+			cat testcase/temp.out
+		fi
+	done
+done
+
+rm -f testcase/out.ir testcase/in.c testcase/out.s testcase/temp.out

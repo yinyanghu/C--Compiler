@@ -1,0 +1,67 @@
+#!/bin/bash
+
+for K in A D G H J
+do
+	echo -n "Testing $K: "
+	cp testcase/CheatIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	spim -file testcase/out.s > testcase/temp.out
+	sed -i '1,5d' testcase/temp.out
+	diff testcase/CheatIR/$K.out testcase/temp.out > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		echo "Accept!"
+	else
+		echo "Wrong Answer!"
+		echo "Standard Output:"
+		cat testcase/CheatIR/$K.out
+		echo "Your Output:"
+		cat testcase/temp.out
+	fi
+done
+
+for K in I
+do
+	echo -n "Testing $K: "
+	cp testcase/CheatIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	spim -file testcase/out.s < testcase/CheatIR/$K.in > testcase/temp.out
+	sed -i '1,5d' testcase/temp.out
+	diff testcase/CheatIR/$K.out testcase/temp.out > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		echo "Accept!"
+	else
+		echo "Wrong Answer!"
+		echo "Standard Output:"
+		cat testcase/CheatIR/$K.out
+		echo "Your Output:"
+		cat testcase/temp.out
+	fi
+done
+
+for K in B C E F
+do
+	echo "Testing $K:"
+	cp testcase/CheatIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	for T in 1 2 3 4 5
+	do
+		echo -ne "\tCase $T: "
+		spim -file testcase/out.s < testcase/CheatIR/$K.in$T > testcase/temp.out
+		sed -i '1,5d' testcase/temp.out
+		diff testcase/CheatIR/$K.out$T testcase/temp.out > /dev/null 2>&1
+		if [ $? -eq 0 ]
+		then
+			echo "Accept!"
+		else
+			echo "Wrong Answer!"
+			echo "Standard Output:"
+			cat testcase/CheatIR/$K.out$T
+			echo "Your Output:"
+			cat testcase/temp.out
+		fi
+	done
+done
+
+rm -f testcase/out.ir testcase/in.c testcase/out.s testcase/temp.out

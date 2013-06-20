@@ -1,4 +1,4 @@
-int add(int temp[2])
+int Add(int temp[2])
 {
 	return (temp[0] + temp[1]);
 }
@@ -15,7 +15,7 @@ int main()
 			op[j] = i + j;
 			j = j + 1;
 		}
-		r[0][i] = add(op);
+		r[0][i] = Add(op);
 		write(r[0][i]);
 		i = i + 1;
 		j = 0;

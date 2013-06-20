@@ -279,7 +279,16 @@ struct IRChain	*OPT_Function(struct IRChain *head, FILE *file)
 	for (i = 0; i < MaxLabel; ++ i)
 		BlockPool[i] = NULL;
 
-	// Divide function into blocks
+	/* For Building Stack Frame */
+
+	head -> prev -> next = NULL; // Break Code Ring
+
+	Arg_build(head);
+	Stack_build(head);
+
+	head -> prev -> next = head; // Link Code Ring
+
+	/* Divide function into blocks */
 	struct IRChain	*ptr;
 
 	struct CodeBlock	*waitting = NULL;
