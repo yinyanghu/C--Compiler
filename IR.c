@@ -424,7 +424,7 @@ struct IRChain *IR_ExtDef(struct ExtDef *root)
 
 struct IRChain *IR_ExtDef_A(void *root)
 {
-	//fprintf(stderr, "You are a Liar!\n");
+	fprintf(stderr, "Warning: The IR Simulator cannot support global variable!\n");
 	return NULL;
 }
 

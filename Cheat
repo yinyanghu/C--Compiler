@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "==================== CheatIR ===================="
 for K in A D G H J
 do
 	echo -n "Testing $K: "

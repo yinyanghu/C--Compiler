@@ -498,8 +498,8 @@ void MC_Calc(struct IRCode *code)
 {
 	struct RegisterType		*result = Register_get(code -> binary.result);
 
-	int		constantA = Checking_Constant(code -> binary.op1);
-	int		constantB = Checking_Constant(code -> binary.op2);
+	int	constantA = Checking_Constant(code -> binary.op1);
+	int	constantB = Checking_Constant(code -> binary.op2);
 
 	struct RegisterType		*op1, *op2;
 	if (constantA == 1)
@@ -608,8 +608,25 @@ void MC_CondGoto(struct IRCode *code)
 {
 	Register_save();
 
-	struct RegisterType		*left = Register_get(code -> condjump.left);	
-	struct RegisterType		*right = Register_get(code -> condjump.right);	
+	int	constantL = Checking_Constant(code -> condjump.left);
+	int	constantR = Checking_Constant(code -> condjump.right);
+
+	struct RegisterType		*left, *right;
+	if (constantL == 1)
+	{
+		MC_Li(&V0, code -> condjump.left -> constant);
+		left = &V0;
+	}
+	else
+		left = Register_get(code -> condjump.left);	
+
+	if (constantR == 1)
+	{
+		MC_Li(&V1, code -> condjump.right -> constant);
+		right = &V1;
+	}
+	else
+		right = Register_get(code -> condjump.right);	
 
 	if (code -> condjump.op == OP_EQ)
 		fprintf(MC_file, "beq ");

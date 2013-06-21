@@ -93,4 +93,114 @@ do
 	done
 done
 
+echo "==================== SampleIR ===================="
+for K in A B
+do
+	echo "Testing $K:"
+	cp testcase/SampleIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	for T in 1 2 3 4 5
+	do
+		echo -ne "\tCase $T: "
+		spim -file testcase/out.s < testcase/SampleIR/$K.in$T > testcase/temp.out
+		sed -i '1,5d' testcase/temp.out
+		diff testcase/SampleIR/$K.out$T testcase/temp.out > /dev/null 2>&1
+		if [ $? -eq 0 ]
+		then
+			echo "Accept!"
+		else
+			echo "Wrong Answer!"
+			echo "Standard Output:"
+			cat testcase/SampleIR/$K.out$T
+			echo "Your Output:"
+			cat testcase/temp.out
+		fi
+	done
+done
+
+for K in C D
+do
+	echo -n "Testing $K: "
+	cp testcase/SampleIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	spim -file testcase/out.s > testcase/temp.out
+	sed -i '1,5d' testcase/temp.out
+	diff testcase/SampleIR/$K.out testcase/temp.out > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		echo "Accept!"
+	else
+		echo "Wrong Answer!"
+		echo "Standard Output:"
+		cat testcase/SampleIR/$K.out
+		echo "Your Output:"
+		cat testcase/temp.out
+	fi
+done
+
+
+echo "==================== SampleMC ===================="
+for K in A
+do
+	echo -n "Testing $K: "
+	cp testcase/SampleMC/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	spim -file testcase/out.s < testcase/SampleMC/A.in > testcase/temp.out
+	sed -i '1,5d' testcase/temp.out
+	diff testcase/SampleMC/$K.out testcase/temp.out > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		echo "Accept!"
+	else
+		echo "Wrong Answer!"
+		echo "Standard Output:"
+		cat testcase/SampleMC/$K.out
+		echo "Your Output:"
+		cat testcase/temp.out
+	fi
+done
+
+
+echo "==================== TestIR ===================="
+for K in bubble call cool gcd hanoi knapsack matrix maxmin nested quicksort scope fib2 fib
+do
+	echo -n "Testing $K: "
+	cp testcase/TestIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	spim -file testcase/out.s > testcase/temp.out
+	sed -i '1,5d' testcase/temp.out
+	diff testcase/TestIR/$K.out testcase/temp.out > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		echo "Accept!"
+	else
+		echo "Wrong Answer!"
+		echo "Standard Output:"
+		cat testcase/TestIR/$K.out
+		echo "Your Output:"
+		cat testcase/temp.out
+	fi
+done
+
+for K in Quicksort
+do
+	echo -n "Testing $K: "
+	cp testcase/TestIR/$K.c testcase/in.c
+	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	spim -file testcase/out.s < testcase/TestIR/$K.in > testcase/temp.out
+	sed -i '1,5d' testcase/temp.out
+	diff testcase/TestIR/$K.out testcase/temp.out > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		echo "Accept!"
+	else
+		echo "Wrong Answer!"
+		echo "Standard Output:"
+		cat testcase/TestIR/$K.out
+		echo "Your Output:"
+		cat testcase/temp.out
+	fi
+done
+
+
 rm -f testcase/out.ir testcase/in.c testcase/out.s testcase/temp.out

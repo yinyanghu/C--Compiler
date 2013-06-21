@@ -14,6 +14,14 @@ A simplified C Compiler
 
 ## Timeline
 
+* June 21, 2013
+
+> Generating Machine Code: Debug, Test(Con't)
+
+* June 20, 2013
+
+> Generating Machine Code: Debug, Test(Con't)
+
 * June 19, 2013
 
 > Generating Machine Code: Function Call, Debug, Test
