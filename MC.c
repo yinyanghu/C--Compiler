@@ -12,16 +12,18 @@
 				ENDLINE
 */
 
-#define	MaxRegister		18
+#define	MaxRegister		22		// $t0-$t9, $s0-$s7, $a0-$a3
 #define MaxStack	100000
-#define MaxArg		2000
+#define MaxArg		100
 // Bug: size !!!
 
 #define FPoffset	8		// $fp + $ra
 
 /* Available Registers */
 struct RegisterType		Register[MaxRegister];
-struct RegisterType		FP, SP, V0, V1, RA, A0;
+struct RegisterType		FP, SP, V0, V1, RA;
+
+struct RegisterType		*A0;
 
 
 struct IRChain	*pc = NULL;
@@ -173,25 +175,32 @@ void Register_special(void)
 	sprintf(SP.name, "$sp");
 	sprintf(V0.name, "$v0");
 	sprintf(V1.name, "$v1");
-	sprintf(A0.name, "$a0");
+	//sprintf(A0.name, "$a0");
 	
-	FP.key = RA.key = SP.key = V1.key = V0.key = A0.key = NULL;
+	FP.key = RA.key = SP.key = V1.key = V0.key = NULL;
+
+	A0 = Register + 18;
 
 	int i;
 	/* Register $t0 ~ $t9 */
 	for (i = 0; i <= 9; ++ i)
 	{
 		sprintf(Register[i].name, "$t%d", i);
-		//Register[i].free = 1;
 		Register[i].key = NULL;
 	}
 
-	/* Register $s0 ~ $s9 */
+	/* Register $s0 ~ $s7 */
 	for (i = 0; i <= 7; ++ i)
 	{
 		sprintf(Register[i + 10].name, "$s%d", i);
-		//Register[i + 10].free = 1;
 		Register[i + 10].key = NULL;
+	}
+
+	/* Register $a0 ~ $a3 */
+	for (i = 0; i <= 3; ++ i)
+	{
+		sprintf(Register[i + 18].name, "$a%d", i);
+		Register[i + 18].key = NULL;
 	}
 }
 
@@ -306,6 +315,7 @@ void Register_free(struct RegisterType *reg)
 
 void Register_spill(struct RegisterType *reg)
 {
+	if (reg -> key == NULL) return;
 	if (Checking_Constant(reg -> key) == 0)
 	{
 		int offset = Arg_offset(reg -> key);
@@ -661,7 +671,9 @@ void MC_Read(struct IRCode *code)
 void MC_Write(struct IRCode *code)
 {
 	struct RegisterType		*reg = Register_get(code -> single);
-	MC_Move(reg, &A0);
+
+	Register_spill(A0);
+	MC_Move(reg, A0);
 	fprintf(MC_file, "jal write"); ENDLINE
 
 	MC_Restore_ra();

@@ -5,7 +5,7 @@ for K in A C D E G H I K L M N O P
 do
 	echo -n "Testing $K: "
 	cp testcase/StdIR/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	spim -file testcase/out.s > testcase/temp.out
 	sed -i '1,5d' testcase/temp.out
 	diff testcase/StdIR/$K.out testcase/temp.out > /dev/null 2>&1
@@ -25,7 +25,7 @@ for K in B
 do
 	echo "Testing $K:"
 	cp testcase/StdIR/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	for T in 1
 	do
 		echo -ne "\tCase $T: "
@@ -49,7 +49,7 @@ for K in F
 do
 	echo "Testing $K:"
 	cp testcase/StdIR/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	for T in 1 2
 	do
 		echo -ne "\tCase $T: "
@@ -73,7 +73,7 @@ for K in J
 do
 	echo "Testing $K:"
 	cp testcase/StdIR/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	for T in 1 2 3
 	do
 		echo -ne "\tCase $T: "
@@ -98,7 +98,7 @@ for K in A B
 do
 	echo "Testing $K:"
 	cp testcase/SampleIR/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	for T in 1 2 3 4 5
 	do
 		echo -ne "\tCase $T: "
@@ -122,7 +122,7 @@ for K in C D
 do
 	echo -n "Testing $K: "
 	cp testcase/SampleIR/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	spim -file testcase/out.s > testcase/temp.out
 	sed -i '1,5d' testcase/temp.out
 	diff testcase/SampleIR/$K.out testcase/temp.out > /dev/null 2>&1
@@ -144,7 +144,7 @@ for K in A
 do
 	echo -n "Testing $K: "
 	cp testcase/SampleMC/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	spim -file testcase/out.s < testcase/SampleMC/A.in > testcase/temp.out
 	sed -i '1,5d' testcase/temp.out
 	diff testcase/SampleMC/$K.out testcase/temp.out > /dev/null 2>&1
@@ -166,7 +166,7 @@ for K in bubble call cool gcd hanoi knapsack matrix maxmin nested quicksort scop
 do
 	echo -n "Testing $K: "
 	cp testcase/TestIR/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	spim -file testcase/out.s > testcase/temp.out
 	sed -i '1,5d' testcase/temp.out
 	diff testcase/TestIR/$K.out testcase/temp.out > /dev/null 2>&1
@@ -186,7 +186,7 @@ for K in Quicksort
 do
 	echo -n "Testing $K: "
 	cp testcase/TestIR/$K.c testcase/in.c
-	./cmm testcase/in.c testcase/out.ir > testcase/out.s
+	./cmm testcase/in.c testcase/out.s
 	spim -file testcase/out.s < testcase/TestIR/$K.in > testcase/temp.out
 	sed -i '1,5d' testcase/temp.out
 	diff testcase/TestIR/$K.out testcase/temp.out > /dev/null 2>&1
@@ -203,4 +203,4 @@ do
 done
 
 
-rm -f testcase/out.ir testcase/in.c testcase/out.s testcase/temp.out
+rm -f testcase/in.c testcase/out.s testcase/temp.out

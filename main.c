@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	/*yydebug = 1;*/
 
 	/* Open File */
-	if (argc != 3 && argc != 2)
+	if (argc != 2 && argc != 3)
 	{
 		fprintf(stderr, "cmm: fatal error: Input error\n");
 		return -1;
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	/* Options */
 	if (strcmp(argv[1], "--version") == 0)
 	{
-		fprintf(stdout, "cmm: C Minus Minus Compiler 0.2\n");
+		fprintf(stdout, "cmm: C Minus Minus Compiler 0.5\n");
 		fprintf(stdout, "This is a free software written by Jian Li.\n");
 		return 0;
 	}
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 	if (ErrorCounter != 0) return 0;
 
 	/* Generate IR Code */
-	FILE *ir_file = fopen(argv[2], "w");
+	FILE *ir_file = fopen("ir", "w");
 	if (!ir_file)
 	{
 		fprintf(stderr, "cmm: fatal error: IR code file error\n"); 
@@ -69,12 +69,14 @@ int main(int argc, char **argv)
 
 	/* Optimize IR Code && Generate Machine Code */
 	FILE *ir_opt_file = fopen("block", "w");
+	FILE *mc_file = fopen(argv[2], "w");
 
-	MC_Prologue(stdout);
+	MC_Prologue(mc_file);
 
 	IR_Optimizer(IR, ir_opt_file);
 
 	fclose(ir_opt_file);
+	fclose(mc_file);
 
 	return 0;
 }
