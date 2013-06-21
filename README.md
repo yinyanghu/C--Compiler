@@ -18,6 +18,8 @@ A simplified C Compiler
 
 > Generating Machine Code: Debug, Test(Con't)
 
+> C-- Compiler Ver 0.5
+
 * June 20, 2013
 
 > Generating Machine Code: Debug, Test(Con't)
